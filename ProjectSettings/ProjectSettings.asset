@@ -565,11 +565,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: Hololens_2019
   metroPackageVersion: 
-  metroCertificatePath: 
+  metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: DefaultCompany
+  metroCertificateIssuer: DefaultCompany
+  metroCertificateNotAfter: 00f642f449f7d501
   metroApplicationDescription: Hololens_2019
   wsaImages: {}
   metroTileShortName: 
