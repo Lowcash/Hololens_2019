@@ -4,4 +4,6 @@ using UnityEngine;
 
 public interface IPositioning  {
     void StartPositioning();
+
+    void StopPositioning();
 }

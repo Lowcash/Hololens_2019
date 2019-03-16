@@ -141,6 +141,36 @@ namespace HoloToolkit.Unity
         }
 
         /// <summary>
+        /// Sets the target local position for the transform and if position wasn't
+        /// already animating, fires the InterpolationStarted event.
+        /// </summary>
+        /// <param name="target">The new target position to for the transform.</param>
+        public void SetTargetLocalPosition(Vector3 target)
+        {
+            bool wasRunning = Running;
+
+            targetPosition = target;
+
+            float magsq = (targetPosition - transform.localPosition).sqrMagnitude;
+            if (magsq > smallNumber)
+            {
+                AnimatingPosition = true;
+                enabled = true;
+
+                if (InterpolationStarted != null && !wasRunning)
+                {
+                    InterpolationStarted();
+                }
+            }
+            else
+            {
+                // Set immediately to prevent accumulation of error.
+                transform.localPosition = target;
+                AnimatingPosition = false;
+            }
+        }
+
+        /// <summary>
         /// Sets the target rotation for the transform and if rotation wasn't
         /// already animating, fires the InterpolationStarted event.
         /// </summary>

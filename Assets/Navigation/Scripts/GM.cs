@@ -5,8 +5,13 @@ using UnityEngine;
 public class GM : MonoBehaviour {
     public GameObject player;
 
+    [Header("Sticker UI")]
+    public List<GameObject> stickers = new List<GameObject>();
+
     [Header("Object to generate")]
     public GameObject findObject;
+
+    [Header("Navigation")]
     public List<GameObject> navigations = new List<GameObject>();
 
     [Header("Generate object parents")]
@@ -18,49 +23,59 @@ public class GM : MonoBehaviour {
 
     public Vector3 navigationObjectOffsetFromPlayer;
 
+    private List<GameObject> _generatedNavigations = new List<GameObject>();
     private List<GameObject> _generatedFindObjects = new List<GameObject>();
 
     private List<Tracking> _trackings = new List<Tracking>();
     private List<Measurement> _measurements = new List<Measurement>();
     private List<Visualizing> _visualizings = new List<Visualizing>();
+    private List<Positioning> _positionings = new List<Positioning>();
+
+    private Vector3 _playerPosition;
 
     private void Start()
     {
-        GenerateObjectToFind();
-        GenerateNavigationObject();
+        UpdatePlayerPosition();
+
+        GenerateObjectToFind(GetRangeFromPlayer(_playerPosition));
+        //GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition));
+        GenerateNavigations();
+
+        AssignManagingProperties(_generatedNavigations);
+        AssignManagingProperties(stickers);
 
         if (_generatedFindObjects.Count > 0)
         {
             _measurements.ForEach(g => g.SetMeasurementTo(_generatedFindObjects[0]));
             _trackings.ForEach(g => g.SetTrackingTo(_generatedFindObjects[0]));
-
-            _measurements.ForEach(g => g.StartMeasuring());
-            _trackings.ForEach(g => g.StartTracking());
-            _visualizings.ForEach(v => v.StartVisualizing());
         }
+
+        _measurements.ForEach(g => g.StartMeasuring());
+        _trackings.ForEach(g => g.StartTracking());
+        _visualizings.ForEach(v => v.StartVisualizing());
+        _positionings.ForEach(p => p.StartPositioning());
     }
 
-    private void GenerateObjectToFind()
+    private void UpdatePlayerPosition()
     {
-        var playerPosition = player.transform.position;
+        _playerPosition = player.transform.position;
+    }
 
-        var generatedObject = Instantiate(findObject, GetRangeFromPlayer(playerPosition), Quaternion.identity, findObjectParent.transform);
-        //var generatedObject = Instantiate(findObject, GetRandomRangeFromPlayer(playerPosition), Quaternion.identity, findObjectParent.transform);
+    private void GenerateObjectToFind(Vector3 positionToGenerate)
+    {
+        var generatedObject = Instantiate(findObject, positionToGenerate, Quaternion.identity, findObjectParent.transform);
 
         _generatedFindObjects.Add(generatedObject);
     }
 
-    private void GenerateNavigationObject()
+    private void AssignManagingProperties(List<GameObject> objects)
     {
-        var playerPosition = player.transform.position;
-
-        foreach (var navigation in navigations)
+        foreach (var item in objects)
         {
-            var generatedObject = Instantiate(navigation, GetDefaultNavigationPositionFromPlayer(playerPosition), Quaternion.identity, navigationObjectParent.transform);
-
-            var tracking = generatedObject.GetComponent<Tracking>();
-            var measurement = generatedObject.GetComponent<Measurement>();
-            var visualizing = generatedObject.GetComponent<Visualizing>();
+            var tracking = item.GetComponent<Tracking>();
+            var measurement = item.GetComponent<Measurement>();
+            var visualizing = item.GetComponent<Visualizing>();
+            var positioning = item.GetComponent<Positioning>();
 
             if (tracking)
             {
@@ -74,6 +89,22 @@ public class GM : MonoBehaviour {
             {
                 _visualizings.Add(visualizing);
             }
+            if (positioning)
+            {
+                _positionings.Add(positioning);
+            }
+        }
+    }
+
+    private void GenerateNavigations()
+    {
+        var playerPosition = player.transform.position;
+
+        foreach (var navigation in navigations)
+        {
+            var generatedNavigation = Instantiate(navigation, GetDefaultNavigationPositionFromPlayer(playerPosition), Quaternion.identity, navigationObjectParent.transform);
+
+            _generatedNavigations.Add(generatedNavigation);
         }
     }
 

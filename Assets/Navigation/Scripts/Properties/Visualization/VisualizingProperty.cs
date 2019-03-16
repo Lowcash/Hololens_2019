@@ -8,4 +8,9 @@ public class VisualizingProperty : Property, IVisualizing
     {
         IsEnable = true;
     }
+
+    public void StopVisualizing()
+    {
+        IsEnable = false;
+    }
 }

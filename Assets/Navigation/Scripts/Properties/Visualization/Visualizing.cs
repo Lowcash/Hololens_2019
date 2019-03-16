@@ -12,6 +12,11 @@ public class Visualizing : MonoBehaviour, IVisualizing {
 
     public void StartVisualizing()
     {
-        visualizingProperties.ForEach(v => v.IsEnable = true);
+        visualizingProperties.ForEach(v => v.StartVisualizing());
+    }
+
+    public void StopVisualizing()
+    {
+        visualizingProperties.ForEach(v => v.StartVisualizing());
     }
 }

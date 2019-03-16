@@ -5,4 +5,6 @@ using UnityEngine;
 public interface IVisualizing
 {
     void StartVisualizing();
+
+    void StopVisualizing();
 }

@@ -6,15 +6,6 @@ using HoloToolkit.Unity.SpatialMapping;
 
 
 public class Settings : MonoBehaviour {
-    private TapToPlace tapToPlaceScript;
-    private Interpolator interpolatorScript;
-
-    private void Awake()
-    {
-        tapToPlaceScript = GetComponent<TapToPlace>();
-        interpolatorScript = GetComponent<Interpolator>();
-    }
-
     public void OnHideSettingsClick()
     {
         gameObject.SetActive(false);

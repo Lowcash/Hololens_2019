@@ -49,6 +49,8 @@ namespace HoloToolkit.Unity.InputModule
 
         public bool IsDraggingEnabled = true;
 
+        public Vector3 MoveDirection;
+
         private bool isDragging;
         private bool isGazed;
         private Vector3 objRefForward;
@@ -255,6 +257,9 @@ namespace HoloToolkit.Unity.InputModule
             }
 
             Vector3 newPosition = Vector3.Lerp(HostTransform.position, draggingPosition + cameraTransform.TransformDirection(objRefGrabPoint), PositionLerpSpeed);
+
+            MoveDirection = newPosition - HostTransform.position;
+
             // Apply Final Position
             if (hostRigidbody == null)
             {

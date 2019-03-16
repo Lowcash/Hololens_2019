@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 33252643635256728}
   - component: {fileID: 23846755539400296}
   - component: {fileID: 95863676459200366}
+  - component: {fileID: 114982196595577088}
   m_Layer: 2
   m_Name: ArrowRender
   m_TagString: Untagged
@@ -228,9 +229,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ad9ae2d02ed3f4f9a1cbe0caef433b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distanceToStartDissapear: 3
   objectRenderWrapper: {fileID: 1498368576751570}
   objectRender: {fileID: 1090932139296080}
+  shaderExtensionEffectScript: {fileID: 114982196595577088}
+  distanceToStartDissapear: 0.5
 --- !u!114 &114736203002382912
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -255,3 +257,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackableProperties:
   - {fileID: 114231699892006692}
+--- !u!114 &114982196595577088
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1090932139296080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c9f834be81d8a54db9a23d8a8399403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shaderToModify: {fileID: 4800000, guid: 6f6329401b0f4a34ea734a0ac90baafc, type: 3}

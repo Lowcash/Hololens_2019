@@ -4,40 +4,47 @@ using UnityEngine;
 
 public class DissapearByDistance : VisualizingProperty
 {
-    public float distanceToStartDissapear;
-
     public GameObject objectRenderWrapper;
     public GameObject objectRender;
 
-    private float _actualDistance;
+    public ShaderExtensionEffectManager shaderExtensionEffectScript;
 
-    private Renderer _objectRenderer;
+    [Header("Settings")]
+    public float distanceToStartDissapear;
+
+    private float _actualDistance;
+    private float _previousDistance;
 
     public void SetActualDistance(float distance)
     {
         _actualDistance = distance;
     }
 
-    private void Start()
+    private void Update()
     {
-        _objectRenderer = objectRender.GetComponent<Renderer>();
+        if (_previousDistance != _actualDistance)
+        {
+            SetObjectTransparency(Mathf.Max(GetDotRotation(), GetDistance()));
+
+            _previousDistance = _actualDistance;
+        }
     }
 
-    private void Update()
+    private void SetObjectTransparency(float transparency)
+    {
+        shaderExtensionEffectScript.SetTransparency(transparency);
+    }
+
+    private float GetDistance()
+    {
+        return _actualDistance / distanceToStartDissapear;
+    }
+
+    private float GetDotRotation()
     {
         var localRotation = objectRenderWrapper.transform.localRotation;
         localRotation.w = Mathf.Abs(localRotation.w);
 
-        float dotRotation = 1.0f - Quaternion.Dot(Quaternion.identity, localRotation);
-        float distance = _actualDistance / distanceToStartDissapear;
-
-        if (_actualDistance < distanceToStartDissapear)
-        {
-            var objectColor = _objectRenderer.material.GetColor("_Color");
-
-            objectColor.a = Mathf.Max(dotRotation, distance);
-
-            _objectRenderer.material.SetColor("_Color", objectColor);
-        }
+        return 1.0f - Quaternion.Dot(Quaternion.identity, localRotation);
     }
 }
