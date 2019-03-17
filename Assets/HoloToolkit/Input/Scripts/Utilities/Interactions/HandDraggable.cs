@@ -26,6 +26,9 @@ namespace HoloToolkit.Unity.InputModule
         [Tooltip("Transform that will be dragged. Defaults to the object of the component.")]
         public Transform HostTransform;
 
+        [Tooltip("Transform rotated.")]
+        public Transform RotationTransform;
+
         [Tooltip("Scale by which hand movement in z is multiplied to move the dragged object.")]
         public float DistanceScale = 2f;
 
@@ -73,6 +76,11 @@ namespace HoloToolkit.Unity.InputModule
             if (HostTransform == null)
             {
                 HostTransform = transform;
+            }
+
+            if (RotationTransform == null)
+            {
+                RotationTransform = transform;
             }
 
             hostRigidbody = HostTransform.GetComponent<Rigidbody>();
@@ -270,11 +278,22 @@ namespace HoloToolkit.Unity.InputModule
                 hostRigidbody.MovePosition(newPosition);
             }
 
+            //// Apply Final Rotation
+            //Quaternion newRotation = Quaternion.Lerp(HostTransform.rotation, draggingRotation, RotationLerpSpeed);
+            //if (hostRigidbody == null)
+            //{
+            //    HostTransform.rotation = newRotation;
+            //}
+            //else
+            //{
+            //    hostRigidbody.MoveRotation(newRotation);
+            //}
+
             // Apply Final Rotation
-            Quaternion newRotation = Quaternion.Lerp(HostTransform.rotation, draggingRotation, RotationLerpSpeed);
+            Quaternion newRotation = Quaternion.Lerp(RotationTransform.rotation, draggingRotation, RotationLerpSpeed);
             if (hostRigidbody == null)
             {
-                HostTransform.rotation = newRotation;
+                RotationTransform.rotation = newRotation;
             }
             else
             {
@@ -283,8 +302,11 @@ namespace HoloToolkit.Unity.InputModule
 
             if (RotationMode == RotationModeEnum.OrientTowardUserAndKeepUpright)
             {
-                Quaternion upRotation = Quaternion.FromToRotation(HostTransform.up, Vector3.up);
-                HostTransform.rotation = upRotation * HostTransform.rotation;
+                //Quaternion upRotation = Quaternion.FromToRotation(HostTransform.up, Vector3.up);
+                //HostTransform.rotation = upRotation * HostTransform.rotation;
+
+                Quaternion upRotation = Quaternion.FromToRotation(RotationTransform.up, Vector3.up);
+                RotationTransform.rotation = upRotation * RotationTransform.rotation;
             }
         }
 

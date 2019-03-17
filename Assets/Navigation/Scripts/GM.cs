@@ -1,9 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using HoloToolkit.Unity.SpatialMapping;
 
-public class GM : MonoBehaviour {
+public class GM : MonoBehaviour
+{
     public GameObject player;
+    public GameObject spatialMapping;
+    public GameObject spatialProcessing;
+
+    [Header("Settings")]
+    public bool generateObjectToFind = true;
+    public bool generateNavigations = true;
+    public bool setObjectToFindRandomPosition = false;
+
+    public Vector3 findObjectGenerateDistanceFromPlayer;
+    public Vector3 navigationObjectOffsetFromPlayer;
 
     [Header("Sticker UI")]
     public List<GameObject> stickers = new List<GameObject>();
@@ -18,33 +30,62 @@ public class GM : MonoBehaviour {
     public GameObject findObjectParent;
     public GameObject navigationObjectParent;
 
-    [Header("Distances and offsets")]
-    public Vector3 findObjectGenerateDistanceFromPlayer;
+    private Vector3 _playerPosition;
 
-    public Vector3 navigationObjectOffsetFromPlayer;
+    private bool _isFindObjectGenerated = false;
 
     private List<GameObject> _generatedNavigations = new List<GameObject>();
     private List<GameObject> _generatedFindObjects = new List<GameObject>();
+
+    private List<GameObject> _spatialMappingObjects = new List<GameObject>();
 
     private List<Tracking> _trackings = new List<Tracking>();
     private List<Measurement> _measurements = new List<Measurement>();
     private List<Visualizing> _visualizings = new List<Visualizing>();
     private List<Positioning> _positionings = new List<Positioning>();
 
-    private Vector3 _playerPosition;
+    private SpatialMappingObserver _spatialMappingObserverScript;
+
+    private List<SpatialMappingSource.SurfaceObject> _generatedSurfaces = new List<SpatialMappingSource.SurfaceObject>();
+
+    private void Awake()
+    {
+        if (spatialMapping)
+        {
+            _spatialMappingObserverScript = spatialMapping.GetComponent<SpatialMappingObserver>();
+        }
+    }
+
+    private void Update()
+    {
+        UpdateGeneratedSurfaces();
+    }
 
     private void Start()
     {
         UpdatePlayerPosition();
 
-        GenerateObjectToFind(GetRangeFromPlayer(_playerPosition));
-        //GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition));
-        GenerateNavigations();
+        if (generateObjectToFind)
+        {
+            if (setObjectToFindRandomPosition)
+            {
+                GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition));
+            }
+            else
+            {
+                GenerateObjectToFind(GetRangeFromPlayer(_playerPosition));
+            }
+        }
+
+        if (generateNavigations)
+        {
+            GenerateNavigations();
+        }
 
         AssignManagingProperties(_generatedNavigations);
         AssignManagingProperties(stickers);
 
-        if (_generatedFindObjects.Count > 0)
+        if (_isFindObjectGenerated)
         {
             _measurements.ForEach(g => g.SetMeasurementTo(_generatedFindObjects[0]));
             _trackings.ForEach(g => g.SetTrackingTo(_generatedFindObjects[0]));
@@ -63,9 +104,14 @@ public class GM : MonoBehaviour {
 
     private void GenerateObjectToFind(Vector3 positionToGenerate)
     {
-        var generatedObject = Instantiate(findObject, positionToGenerate, Quaternion.identity, findObjectParent.transform);
+        if (findObject)
+        {
+            var generatedObject = Instantiate(findObject, positionToGenerate, Quaternion.identity, findObjectParent.transform);
 
-        _generatedFindObjects.Add(generatedObject);
+            _generatedFindObjects.Add(generatedObject);
+
+            _isFindObjectGenerated = true;
+        }
     }
 
     private void AssignManagingProperties(List<GameObject> objects)
@@ -126,5 +172,21 @@ public class GM : MonoBehaviour {
     private Vector3 GetRangeFromPlayer(Vector3 playerPosition)
     {
         return playerPosition + findObjectGenerateDistanceFromPlayer;
+    }
+
+    private void UpdateGeneratedSurfaces()
+    {
+        if (_generatedSurfaces.Count != _spatialMappingObserverScript.GeneratedSurfaceObjects.Count)
+        {
+            foreach (var surface in _spatialMappingObserverScript.GeneratedSurfaceObjects)
+            {
+                if (!_generatedSurfaces.Contains(surface))
+                {
+                    _generatedSurfaces.Add(surface);
+
+                    Debug.LogFormat("{0} was added to GM surface referencies", surface.Object.name);
+                }
+            }
+        }
     }
 }

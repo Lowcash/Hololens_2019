@@ -69,12 +69,17 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// </summary>
         public ObserverStates ObserverState { get; private set; }
 
+        public LayerHelper.LayerName CreateWithLayer = LayerHelper.LayerName.SpatialMapping;
+
+
         /// <summary>
         /// Indicates the current type of the observed volume
         /// </summary>
         [SerializeField]
         [Tooltip("The shape of the observation volume.")]
         private ObserverVolumeTypes observerVolumeType = ObserverVolumeTypes.AxisAlignedBox;
+
+        public List<SurfaceObject> GeneratedSurfaceObjects = new List<SurfaceObject>();
         public ObserverVolumeTypes ObserverVolumeType
         {
             get
@@ -241,11 +246,12 @@ namespace HoloToolkit.Unity.SpatialMapping
                         Debug.Assert(newSurface.Object.transform.parent == transform);
                         newSurface.ID = surfaceID.handle;
                         newSurface.Renderer.enabled = false;
-
                         worldAnchor = newSurface.Object.GetComponent<WorldAnchor>();
                         Debug.Assert(worldAnchor != null);
                     }
 
+                    newSurface.Object.layer = (int)CreateWithLayer;
+                    
                     var surfaceData = new SurfaceData(
                         surfaceID,
                         newSurface.Filter,
@@ -254,6 +260,8 @@ namespace HoloToolkit.Unity.SpatialMapping
                         TrianglesPerCubicMeter,
                         _bakeCollider: true
                         );
+
+                    GeneratedSurfaceObjects.Add(newSurface);
 
                     if (observer.RequestMeshAsync(surfaceData, SurfaceObserver_OnDataReady))
                     {
