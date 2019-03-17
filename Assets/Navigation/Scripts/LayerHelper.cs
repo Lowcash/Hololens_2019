@@ -10,18 +10,26 @@ public class LayerHelper : MonoBehaviour {
         RaycastSpatialMapping = 1 << 31
     }
 
-    public static List<GameObject> FindObjectsInLayer(GameObject root, int layer)
+    public static List<GameObject> FindObjectsInLayer(GameObject root, LayerName layer)
     {
-        var objects = new List<GameObject>();
+        var objects = new List<GameObject>() { root };
 
-        foreach (Transform t in root.transform.GetComponentsInChildren(typeof(GameObject), true))
+        for (int i = 0; i < objects.Count; i++)
         {
-            if (t.gameObject.layer == layer)
+            foreach (Transform t in objects[i].transform)
             {
-                objects.Add(t.gameObject);
+                if (t.gameObject.layer == (int)layer)
+                {
+                    objects.Add(t.gameObject);
+                }
             }
         }
 
         return objects;
+    }
+
+    public static void SetObjetsLayer(ref List<GameObject> objects, LayerName layer)
+    {
+        objects.ForEach(o => o.layer = (int)layer);
     }
 }

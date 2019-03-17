@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Unity.SpatialMapping;
+using System;
+
+public class HologramClickEventArgs : EventArgs
+{
+    public bool value;
+}
 
 public class HologramBehaviour : PositioningProperty, IInputHandler
 {
+    public static EventHandler<HologramClickEventArgs> OnClicked;
+
     [Header("Hologram objects")]
     public GameObject hologramContentObject;
     public GameObject hologramDraggableObject;
@@ -13,11 +21,11 @@ public class HologramBehaviour : PositioningProperty, IInputHandler
     [Header("Settings")]
     public float directionToPlaceHologram = 1.0f;
 
-    private int _numColliders = 0;
-
     private bool _isPlaced = false;
 
-    private Ray _ray;
+    private int _numColliders;
+
+    private Ray _ray = new Ray();
 
     private Rigidbody _rb;
     private Collider _tapTriggerCollider;
@@ -26,9 +34,10 @@ public class HologramBehaviour : PositioningProperty, IInputHandler
     private TapToPlace _tapToPlaceScript;
     private HandDraggable _handDraggableScript;
 
+    private List<GameObject> _childObjects = new List<GameObject>();
+
     private void Awake()
     {
-        _rb = GetComponent<Rigidbody>();
         _tapTriggerCollider = gameObject.GetComponent<Collider>();
 
         _interpolatorScript = hologramContentObject.GetComponent<Interpolator>();
@@ -38,9 +47,9 @@ public class HologramBehaviour : PositioningProperty, IInputHandler
 
     private void Start()
     {
-        _ray = new Ray();
+        _childObjects.AddRange(LayerHelper.FindObjectsInLayer(hologramContentObject, LayerHelper.LayerName.UI));
 
-        _tapTriggerCollider.enabled = false;
+        PrepareHologramForButtons();
     }
 
     private void Update()
@@ -55,21 +64,7 @@ public class HologramBehaviour : PositioningProperty, IInputHandler
         Debug.DrawLine(_ray.origin, _ray.origin + (_ray.direction * directionToPlaceHologram), Color.red);
 #endif
 
-        //var isSpatialLayerHitted = Physics.Raycast(_ray, out _hit, directionToPlaceHologram, (int)LayerHelper.LayerName.RaycastSpatialMapping);
-
-
-        //if (isSpatialLayerHitted)
-        //{
-        //    //Debug.Log(Vector3.Dot(Camera.main.transform.forward, _ray.origin + _ray.direction));
-        //    //Debug.Log(Camera.main.transform.forward);
-        //}
-
-        if (_numColliders == 0)
-        {
-            _interpolatorScript.SetTargetLocalPosition(gameObject.transform.position);
-        }
-
-        //Debug.Log(_numColliders);
+        UpdateInterpolatorPosition();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -102,7 +97,7 @@ public class HologramBehaviour : PositioningProperty, IInputHandler
 
     private void PlaceHologram()
     {
-        hologramContentObject.transform.SetParent(gameObject.transform.parent);
+        DetachContentFromDragging();
 
         _tapToPlaceScript.enabled = true;
 
@@ -111,7 +106,7 @@ public class HologramBehaviour : PositioningProperty, IInputHandler
 
     private void UnPlaceHologram()
     {
-        hologramContentObject.transform.SetParent(gameObject.transform);
+        AttachContentToDragging();
 
         _tapToPlaceScript.ParentGameObjectToPlace = gameObject;
 
@@ -122,29 +117,79 @@ public class HologramBehaviour : PositioningProperty, IInputHandler
 
     public void OnInputDown(InputEventData eventData)
     {
-        _rb = gameObject.AddComponent<Rigidbody>();
+        OnClicked(this, new HologramClickEventArgs() { value = true });
 
-        _rb.isKinematic = true;
-        _tapTriggerCollider.enabled = true;
+        PrepareHologramForDragging();
+
+        LayerHelper.SetObjetsLayer(ref _childObjects, LayerHelper.LayerName.IgnoreRaycast);
     }
 
     public void OnInputUp(InputEventData eventData)
     {
-        hologramContentObject.layer = (int)LayerHelper.LayerName.UI;
+        OnClicked(this, new HologramClickEventArgs() { value = false });
 
-        Destroy(_rb);
-
-        _interpolatorScript.enabled = false;
-
-        _tapToPlaceScript.IsBeingPlaced = false;
-        _tapTriggerCollider.enabled = false;
-
-        _numColliders = 0;
+        PrepareHologramForButtons();
 
         if (_isPlaced)
         {
-            gameObject.transform.localPosition = hologramContentObject.transform.localPosition;
-            hologramContentObject.transform.SetParent(gameObject.transform);
+            UpdateTapTriggerTransform();
+
+            AttachContentToDragging();
         }
+
+        LayerHelper.SetObjetsLayer(ref _childObjects, LayerHelper.LayerName.UI);
+    }
+
+    private void UpdateTapTriggerTransform()
+    {
+        gameObject.transform.localPosition = hologramContentObject.transform.localPosition;
+        gameObject.transform.localRotation = hologramContentObject.transform.localRotation;
+    }
+
+    private void UpdateInterpolatorPosition()
+    {
+        if (_numColliders == 0)
+        {
+            _interpolatorScript.SetTargetLocalPosition(gameObject.transform.position);
+        }
+    }
+
+    private void PrepareHologramForButtons()
+    {
+        ResetCollidersCounter();
+
+        if (_rb)
+        {
+            Destroy(_rb);
+        }
+
+        _tapToPlaceScript.IsBeingPlaced = false;
+        _tapTriggerCollider.enabled = false;
+    }
+
+    private void PrepareHologramForDragging()
+    {
+        if (!_rb)
+        {
+            _rb = gameObject.AddComponent<Rigidbody>();
+            _rb.isKinematic = true;
+        }
+
+        _tapTriggerCollider.enabled = true;
+    }
+
+    private void AttachContentToDragging()
+    {
+        hologramContentObject.transform.SetParent(gameObject.transform);
+    }
+
+    private void DetachContentFromDragging()
+    {
+        hologramContentObject.transform.SetParent(gameObject.transform.parent);
+    }
+
+    private void ResetCollidersCounter()
+    {
+        _numColliders = 0;
     }
 }

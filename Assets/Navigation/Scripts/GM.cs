@@ -44,21 +44,11 @@ public class GM : MonoBehaviour
     private List<Visualizing> _visualizings = new List<Visualizing>();
     private List<Positioning> _positionings = new List<Positioning>();
 
-    private SpatialMappingObserver _spatialMappingObserverScript;
-
     private List<SpatialMappingSource.SurfaceObject> _generatedSurfaces = new List<SpatialMappingSource.SurfaceObject>();
 
     private void Awake()
     {
-        if (spatialMapping)
-        {
-            _spatialMappingObserverScript = spatialMapping.GetComponent<SpatialMappingObserver>();
-        }
-    }
-
-    private void Update()
-    {
-        UpdateGeneratedSurfaces();
+        SpatialMappingObserver.OnSurfaceCreate += Surface_OnCreate;
     }
 
     private void Start()
@@ -138,6 +128,11 @@ public class GM : MonoBehaviour
             if (positioning)
             {
                 _positionings.Add(positioning);
+
+                if (item.GetComponent<HologramBehaviour>())
+                {
+                    HologramBehaviour.OnClicked += Hologram_OnClick;
+                }
             }
         }
     }
@@ -174,19 +169,31 @@ public class GM : MonoBehaviour
         return playerPosition + findObjectGenerateDistanceFromPlayer;
     }
 
-    private void UpdateGeneratedSurfaces()
+    private void UpdateGeneratedSurfaces(SpatialMappingSource.SurfaceObject surface)
     {
-        if (_generatedSurfaces.Count != _spatialMappingObserverScript.GeneratedSurfaceObjects.Count)
-        {
-            foreach (var surface in _spatialMappingObserverScript.GeneratedSurfaceObjects)
-            {
-                if (!_generatedSurfaces.Contains(surface))
-                {
-                    _generatedSurfaces.Add(surface);
+        _generatedSurfaces.Add(surface);
 
-                    Debug.LogFormat("{0} was added to GM surface referencies", surface.Object.name);
-                }
-            }
-        }
+#if UNITY_EDITOR
+        Debug.LogFormat("{0} was added to GM surface referencies", surface.Object.name);
+#endif
+    }
+
+    public void Surface_OnCreate(object sender, SurfaceEventArgs e)
+    {
+        UpdateGeneratedSurfaces(e.surfaceObject);
+    }
+
+    public void Hologram_OnClick(object sender, HologramClickEventArgs e)
+    {
+        SetSurfacesCollidersActive(e.value);
+
+#if UNITY_EDITOR
+        Debug.LogFormat("Hologram {0}", e.value ? "clicked" : "unclicked");
+#endif
+    }
+
+    public void SetSurfacesCollidersActive(bool enabled)
+    {
+        _generatedSurfaces.ForEach(s => s.Collider.enabled = enabled);
     }
 }

@@ -52,6 +52,11 @@ namespace HoloToolkit.Unity.SpatialMapping
         Sphere = 2
     }
 
+    public class SurfaceEventArgs : EventArgs
+    {
+        public SpatialMappingSource.SurfaceObject surfaceObject;
+    }
+
     /// <summary>
     /// The SpatialMappingObserver class encapsulates the SurfaceObserver into an easy to use
     /// object that handles managing the observed surfaces and the rendering of surface geometry.
@@ -71,6 +76,7 @@ namespace HoloToolkit.Unity.SpatialMapping
 
         public LayerHelper.LayerName CreateWithLayer = LayerHelper.LayerName.SpatialMapping;
 
+        public static EventHandler<SurfaceEventArgs> OnSurfaceCreate;
 
         /// <summary>
         /// Indicates the current type of the observed volume
@@ -79,7 +85,6 @@ namespace HoloToolkit.Unity.SpatialMapping
         [Tooltip("The shape of the observation volume.")]
         private ObserverVolumeTypes observerVolumeType = ObserverVolumeTypes.AxisAlignedBox;
 
-        public List<SurfaceObject> GeneratedSurfaceObjects = new List<SurfaceObject>();
         public ObserverVolumeTypes ObserverVolumeType
         {
             get
@@ -251,7 +256,8 @@ namespace HoloToolkit.Unity.SpatialMapping
                     }
 
                     newSurface.Object.layer = (int)CreateWithLayer;
-                    
+                    newSurface.Collider.enabled = false;
+
                     var surfaceData = new SurfaceData(
                         surfaceID,
                         newSurface.Filter,
@@ -261,7 +267,7 @@ namespace HoloToolkit.Unity.SpatialMapping
                         _bakeCollider: true
                         );
 
-                    GeneratedSurfaceObjects.Add(newSurface);
+                    OnSurfaceCreate(this, new SurfaceEventArgs() { surfaceObject = newSurface });
 
                     if (observer.RequestMeshAsync(surfaceData, SurfaceObserver_OnDataReady))
                     {
