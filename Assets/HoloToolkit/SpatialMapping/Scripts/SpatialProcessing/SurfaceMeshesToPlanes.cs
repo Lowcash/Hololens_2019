@@ -11,13 +11,19 @@ using System.Threading;
 using System.Threading.Tasks;
 #endif
 
-namespace HoloToolkit.Unity.SpatialMapping
-{
+namespace HoloToolkit.Unity.SpatialMapping {
+    public class PlanesEventArgs : EventArgs {
+        public GameObject planeObject;
+    }
+
+    public class SpatialProcessingEventArgs : EventArgs {
+        public bool isProcessing;
+    }
+
     /// <summary>
     /// SurfaceMeshesToPlanes will find and create planes based on the meshes returned by the SpatialMappingManager's Observer.
     /// </summary>
-    public class SurfaceMeshesToPlanes : Singleton<SurfaceMeshesToPlanes>
-    {
+    public class SurfaceMeshesToPlanes : Singleton<SurfaceMeshesToPlanes> {
         [Tooltip("Currently active planes found within the Spatial Mapping Mesh.")]
         public List<GameObject> ActivePlanes;
 
@@ -58,7 +64,10 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// </summary>
         /// <param name="source"></param>
         /// <param name="args"></param>
-        public delegate void EventHandler(object source, EventArgs args);
+        public delegate void EventHandler( object source,EventArgs args );
+
+        public static EventHandler<PlanesEventArgs> OnPlaneCreate;
+        public static EventHandler<SpatialProcessingEventArgs> OnChangePlaneProcessingState;
 
         /// <summary>
         /// EventHandler which is triggered when the MakePlanesRoutine is finished.
@@ -93,8 +102,7 @@ namespace HoloToolkit.Unity.SpatialMapping
 #endif
 
         // GameObject initialization.
-        private void Start()
-        {
+        private void Start() {
             makingPlanes = false;
             ActivePlanes = new List<GameObject>();
             planesParent = new GameObject("SurfacePlanes");
@@ -105,14 +113,14 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// <summary>
         /// Creates planes based on meshes gathered by the SpatialMappingManager's SurfaceObserver.
         /// </summary>
-        public void MakePlanes()
-        {
-            if (!makingPlanes)
-            {
+        public void MakePlanes() {
+            if (!makingPlanes) {
                 makingPlanes = true;
                 // Processing the mesh can be expensive...
                 // We use Coroutine to split the work across multiple frames and avoid impacting the frame rate too much.
                 StartCoroutine(MakePlanesRoutine());
+
+                OnChangePlaneProcessingState(this, new SpatialProcessingEventArgs() { isProcessing = true });
             }
         }
 
@@ -121,18 +129,14 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// </summary>
         /// <param name="planeTypes">A flag which includes all plane type(s) that should be returned.</param>
         /// <returns>A collection of planes that match the expected type(s).</returns>
-        public List<GameObject> GetActivePlanes(PlaneTypes planeTypes)
-        {
+        public List<GameObject> GetActivePlanes( PlaneTypes planeTypes ) {
             List<GameObject> typePlanes = new List<GameObject>();
 
-            foreach (GameObject plane in ActivePlanes)
-            {
+            foreach (GameObject plane in ActivePlanes) {
                 SurfacePlane surfacePlane = plane.GetComponent<SurfacePlane>();
 
-                if (surfacePlane != null)
-                {
-                    if ((planeTypes & surfacePlane.PlaneType) == surfacePlane.PlaneType)
-                    {
+                if (surfacePlane != null) {
+                    if ((planeTypes & surfacePlane.PlaneType) == surfacePlane.PlaneType) {
                         typePlanes.Add(plane);
                     }
                 }
@@ -145,11 +149,9 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// Iterator block, analyzes surface meshes to find planes and create new 3D cubes to represent each plane.
         /// </summary>
         /// <returns>Yield result.</returns>
-        private IEnumerator MakePlanesRoutine()
-        {
+        private IEnumerator MakePlanesRoutine() {
             // Remove any previously existing planes, as they may no longer be valid.
-            for (int index = 0; index < ActivePlanes.Count; index++)
-            {
+            for (int index = 0; index < ActivePlanes.Count; index++) {
                 Destroy(ActivePlanes[index]);
             }
 
@@ -163,18 +165,15 @@ namespace HoloToolkit.Unity.SpatialMapping
             List<PlaneFinding.MeshData> meshData = new List<PlaneFinding.MeshData>();
             List<MeshFilter> filters = SpatialMappingManager.Instance.GetMeshFilters();
 
-            for (int index = 0; index < filters.Count; index++)
-            {
+            for (int index = 0; index < filters.Count; index++) {
                 MeshFilter filter = filters[index];
-                if (filter != null && filter.sharedMesh != null)
-                {
+                if (filter != null && filter.sharedMesh != null) {
                     // fix surface mesh normals so we can get correct plane orientation.
                     filter.mesh.RecalculateNormals();
                     meshData.Add(new PlaneFinding.MeshData(filter));
                 }
 
-                if ((Time.realtimeSinceStartup - start) > FrameTime)
-                {
+                if ((Time.realtimeSinceStartup - start) > FrameTime) {
                     // Pause our work, and continue to make more PlaneFinding objects on the next frame.
                     yield return null;
                     start = Time.realtimeSinceStartup;
@@ -196,7 +195,7 @@ namespace HoloToolkit.Unity.SpatialMapping
             BoundedPlane[] planes = planeTask.Result;
 #else
             // In the unity editor, the task class isn't available, but perf is usually good, so we'll just wait for FindPlanes to complete.
-            BoundedPlane[] planes = PlaneFinding.FindPlanes(meshData, snapToGravityThreshold, MinArea);
+            BoundedPlane[] planes = PlaneFinding.FindPlanes(meshData,snapToGravityThreshold,MinArea);
 #endif
 
             // Pause our work here, and continue on the next frame.
@@ -209,48 +208,37 @@ namespace HoloToolkit.Unity.SpatialMapping
             CeilingYPosition = 0.0f;
             float upNormalThreshold = 0.9f;
 
-            if (SurfacePlanePrefab != null && SurfacePlanePrefab.GetComponent<SurfacePlane>() != null)
-            {
+            if (SurfacePlanePrefab != null && SurfacePlanePrefab.GetComponent<SurfacePlane>() != null) {
                 upNormalThreshold = SurfacePlanePrefab.GetComponent<SurfacePlane>().UpNormalThreshold;
             }
 
             // Find the floor and ceiling.
             // We classify the floor as the maximum horizontal surface below the user's head.
             // We classify the ceiling as the maximum horizontal surface above the user's head.
-            for (int i = 0; i < planes.Length; i++)
-            {
+            for (int i = 0; i < planes.Length; i++) {
                 BoundedPlane boundedPlane = planes[i];
-                if (boundedPlane.Bounds.Center.y < 0 && boundedPlane.Plane.normal.y >= upNormalThreshold)
-                {
-                    maxFloorArea = Mathf.Max(maxFloorArea, boundedPlane.Area);
-                    if (maxFloorArea == boundedPlane.Area)
-                    {
+                if (boundedPlane.Bounds.Center.y < 0 && boundedPlane.Plane.normal.y >= upNormalThreshold) {
+                    maxFloorArea = Mathf.Max(maxFloorArea,boundedPlane.Area);
+                    if (maxFloorArea == boundedPlane.Area) {
                         FloorYPosition = boundedPlane.Bounds.Center.y;
                     }
-                }
-                else if (boundedPlane.Bounds.Center.y > 0 && boundedPlane.Plane.normal.y <= -(upNormalThreshold))
-                {
-                    maxCeilingArea = Mathf.Max(maxCeilingArea, boundedPlane.Area);
-                    if (maxCeilingArea == boundedPlane.Area)
-                    {
+                } else if (boundedPlane.Bounds.Center.y > 0 && boundedPlane.Plane.normal.y <= -(upNormalThreshold)) {
+                    maxCeilingArea = Mathf.Max(maxCeilingArea,boundedPlane.Area);
+                    if (maxCeilingArea == boundedPlane.Area) {
                         CeilingYPosition = boundedPlane.Bounds.Center.y;
                     }
                 }
             }
 
             // Create SurfacePlane objects to represent each plane found in the Spatial Mapping mesh.
-            for (int index = 0; index < planes.Length; index++)
-            {
+            for (int index = 0; index < planes.Length; index++) {
                 GameObject destinationPlane;
                 BoundedPlane boundedPlane = planes[index];
 
                 // Instantiate a SurfacePlane object, which will have the same bounds as our BoundedPlane object.
-                if (SurfacePlanePrefab != null && SurfacePlanePrefab.GetComponent<SurfacePlane>() != null)
-                {
+                if (SurfacePlanePrefab != null && SurfacePlanePrefab.GetComponent<SurfacePlane>() != null) {
                     destinationPlane = Instantiate(SurfacePlanePrefab);
-                }
-                else
-                {
+                } else {
                     destinationPlane = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     destinationPlane.AddComponent<SurfacePlane>();
                     destinationPlane.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -264,20 +252,18 @@ namespace HoloToolkit.Unity.SpatialMapping
 
                 SetPlaneVisibility(surfacePlane);
 
-                if ((destroyPlanesMask & surfacePlane.PlaneType) == surfacePlane.PlaneType)
-                {
+                if ((destroyPlanesMask & surfacePlane.PlaneType) == surfacePlane.PlaneType) {
                     DestroyImmediate(destinationPlane);
-                }
-                else
-                {
+                } else {
                     // Set the plane to use the same layer as the SpatialMapping mesh.
                     destinationPlane.layer = SpatialMappingManager.Instance.PhysicsLayer;
                     ActivePlanes.Add(destinationPlane);
                 }
 
+                OnPlaneCreate(this,new PlanesEventArgs() { planeObject = destinationPlane });
+
                 // If too much time has passed, we need to return control to the main game loop.
-                if ((Time.realtimeSinceStartup - start) > FrameTime)
-                {
+                if ((Time.realtimeSinceStartup - start) > FrameTime) {
                     // Pause our work here, and continue making additional planes on the next frame.
                     yield return null;
                     start = Time.realtimeSinceStartup;
@@ -288,9 +274,10 @@ namespace HoloToolkit.Unity.SpatialMapping
 
             // We are done creating planes, trigger an event.
             EventHandler handler = MakePlanesComplete;
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
+            if (handler != null) {
+                handler(this,EventArgs.Empty);
+
+                OnChangePlaneProcessingState(this, new SpatialProcessingEventArgs() { isProcessing = false });
             }
 
             makingPlanes = false;
@@ -300,8 +287,7 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// Sets visibility of planes based on their type.
         /// </summary>
         /// <param name="surfacePlane"></param>
-        private void SetPlaneVisibility(SurfacePlane surfacePlane)
-        {
+        private void SetPlaneVisibility( SurfacePlane surfacePlane ) {
             surfacePlane.IsVisible = ((drawPlanesMask & surfacePlane.PlaneType) == surfacePlane.PlaneType);
         }
     }

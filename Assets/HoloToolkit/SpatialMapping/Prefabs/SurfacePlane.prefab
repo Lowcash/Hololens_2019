@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d29c05be38579034196d7b7692e52bc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlaneThickness: 0.01
+  PlaneThickness: 0.3
   UpNormalThreshold: 0.9
   FloorBuffer: 0.1
   CeilingBuffer: 0.1

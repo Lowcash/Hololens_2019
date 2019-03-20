@@ -1,15 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
-using HoloToolkit.Unity;
-using HoloToolkit.Unity.SpatialMapping;
-
 
 public class Settings : MonoBehaviour {
-    public void OnHideSettingsClick()
-    {
+    public void OnRestartButtonClick() {
+        GM.OnRestart(this, new RestartEventArgs());
+    }
+
+    public void OnHideSettingsButtonClick() {
         gameObject.SetActive(false);
-        
+
         Debug.Log("Setting menu was hidden!");
     }
 }

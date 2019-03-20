@@ -74,7 +74,7 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// </summary>
         public ObserverStates ObserverState { get; private set; }
 
-        public LayerHelper.LayerName CreateWithLayer = LayerHelper.LayerName.SpatialMapping;
+        public LayerName CreateWithLayer = LayerName.SpatialMapping;
 
         public static EventHandler<SurfaceEventArgs> OnSurfaceCreate;
 
