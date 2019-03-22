@@ -26,6 +26,8 @@ GameObject:
   - component: {fileID: 114026281415643936}
   - component: {fileID: 114279106109629144}
   - component: {fileID: 114695123884858600}
+  - component: {fileID: 114680319634683170}
+  - component: {fileID: 114346661000134944}
   m_Layer: 2
   m_Name: Meter
   m_TagString: Untagged
@@ -290,6 +292,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applyOn: {fileID: 1517731647965506}
   sizeOfScale: 0
+--- !u!114 &114346661000134944
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1170319383021200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1860a0159f684ae4bb431273cfc33509, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  translation: {x: 0, y: -0.2, z: 2}
+  applyOnStates: 00000000
+  isFromPlayer: 1
+  isApplyPlayerRotation: 0
 --- !u!114 &114354797085004942
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -360,6 +377,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Canvas: {fileID: 223085776811900070}
+--- !u!114 &114680319634683170
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1170319383021200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dde5a1f26a9be16489ecc91f0acad746, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positioningProperties:
+  - {fileID: 114346661000134944}
 --- !u!114 &114695123884858600
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 114830700887680706}
   - component: {fileID: 114424356968104534}
   - component: {fileID: 114457053570729870}
+  - component: {fileID: 114850343467337700}
   - component: {fileID: 114486033495193574}
   m_Layer: 5
   m_Name: SettingsUI
@@ -1442,6 +1443,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   positioningProperties:
   - {fileID: 114457053570729870}
+  - {fileID: 114850343467337700}
 --- !u!114 &114432843049064784
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1671,6 +1673,21 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &114850343467337700
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1150901991419236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1860a0159f684ae4bb431273cfc33509, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  translation: {x: 0, y: 0, z: 3}
+  applyOnStates: 00000000
+  positioningFromPlayer: 1
+  applyPlayerRotation: 0
 --- !u!114 &114897563076372910
 MonoBehaviour:
   m_ObjectHideFlags: 1

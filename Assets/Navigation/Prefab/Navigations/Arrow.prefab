@@ -60,6 +60,8 @@ GameObject:
   - component: {fileID: 114639739200909812}
   - component: {fileID: 114635650366694940}
   - component: {fileID: 114736203002382912}
+  - component: {fileID: 114666309612108306}
+  - component: {fileID: 114923947196603534}
   m_Layer: 2
   m_Name: Arrow
   m_TagString: Tracking
@@ -233,6 +235,19 @@ MonoBehaviour:
   objectRender: {fileID: 1090932139296080}
   shaderExtensionEffectScript: {fileID: 114982196595577088}
   distanceToStartDissapear: 0.5
+--- !u!114 &114666309612108306
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1521308289151756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dde5a1f26a9be16489ecc91f0acad746, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positioningProperties:
+  - {fileID: 114923947196603534}
 --- !u!114 &114736203002382912
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -257,6 +272,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackableProperties:
   - {fileID: 114231699892006692}
+--- !u!114 &114923947196603534
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1521308289151756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1860a0159f684ae4bb431273cfc33509, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  translation: {x: 0, y: -0.2, z: 2}
+  applyOnStates: 00000000
+  positioningFromPlayer: 1
+  applyPlayerRotation: 1
 --- !u!114 &114982196595577088
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SceneHelper: MonoBehaviour {
+public class ObjectHelper {
+    public enum ObjectLifeState { Awake, Start, Life, Destroy }
+
     public static void SetCollidersActive( ref List<Collider> colliders, bool isActive ) {
         colliders.ForEach(c => c.enabled = isActive);
     }

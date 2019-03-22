@@ -15,10 +15,10 @@ public class GM : MonoBehaviour {
     [Header("Settings")]
     public bool generateObjectToFind = true;
     public bool generateNavigations = true;
+    public bool generateStickers = true;
     public bool setObjectToFindRandomPosition = false;
 
     public Vector3 findObjectGenerateDistanceFromPlayer;
-    public Vector3 navigationObjectOffsetFromPlayer;
 
     [Header("Sticker UI")]
     public List<GameObject> stickers = new List<GameObject>();
@@ -30,16 +30,18 @@ public class GM : MonoBehaviour {
     public List<GameObject> navigations = new List<GameObject>();
 
     [Header("Generate object parents")]
-    public GameObject findObjectParent;
-    public GameObject navigationObjectParent;
+    public Transform objectToFindParent;
+    public Transform navigationObjectParent;
+    public Transform UIParent;
 
     private Vector3 _playerPosition;
 
     private bool _isFindObjectGenerated;
     private bool _isSceneInitializing;
 
-    private List<GameObject> _generatedNavigations = new List<GameObject>();
     private List<GameObject> _generatedFindObjects = new List<GameObject>();
+    private List<GameObject> _generatedNavigations = new List<GameObject>();
+    private List<GameObject> _generatedStickers = new List<GameObject>();
 
     private List<Tracking> _trackings = new List<Tracking>();
     private List<Measurement> _measurements = new List<Measurement>();
@@ -65,18 +67,24 @@ public class GM : MonoBehaviour {
 
         if (generateObjectToFind) {
             if (setObjectToFindRandomPosition) {
-                GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition));
+                GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition), objectToFindParent);
             } else {
-                GenerateObjectToFind(GetRangeFromPlayer(_playerPosition));
+                GenerateObjectToFind(GetRangeFromPlayer(_playerPosition), objectToFindParent);
             }
+
+            setObjectToFindRandomPosition = true;
         }
 
         if (generateNavigations) {
-            GenerateNavigations();
+            GenerateObjects(navigations, ref _generatedNavigations, navigationObjectParent);
+        }
+
+        if (generateStickers) {
+            GenerateObjects(stickers, ref _generatedStickers, UIParent);
         }
 
         AssignManagingProperties(_generatedNavigations);
-        AssignManagingProperties(stickers);
+        AssignManagingProperties(_generatedStickers);
 
         if (_isFindObjectGenerated) {
             _measurements.ForEach(g => g.SetMeasurementTo(_generatedFindObjects[0]));
@@ -93,9 +101,17 @@ public class GM : MonoBehaviour {
         _playerPosition = player.transform.position;
     }
 
-    private void GenerateObjectToFind( Vector3 positionToGenerate ) {
+    private void GenerateObjectToFind( Vector3 positionToGenerate, Transform generationParent, bool generateOnlyOne = false ) {
+        if (generateOnlyOne) {
+            _generatedFindObjects.ForEach(g => Destroy(g));
+
+            _generatedFindObjects.Clear();
+
+            _isFindObjectGenerated = false;
+        }
+
         if (findObject) {
-            var generatedObject = Instantiate(findObject, positionToGenerate, Quaternion.identity, findObjectParent.transform);
+            var generatedObject = Instantiate(findObject, positionToGenerate, Quaternion.identity, generationParent);
 
             generatedObject.SetActive(!_isSceneInitializing);
 
@@ -129,23 +145,16 @@ public class GM : MonoBehaviour {
         }
     }
 
-    private void GenerateNavigations() {
+    private void GenerateObjects( List<GameObject> gameObjectPrefabs, ref List<GameObject> gameObjectInstances, Transform generateObjectParent ) {
         var playerPosition = player.transform.position;
 
-        foreach (var navigation in navigations) {
-            var generatedNavigation = Instantiate(navigation, GetDefaultNavigationPositionFromPlayer(playerPosition), Quaternion.identity, navigationObjectParent.transform);
+        foreach (var prefab in gameObjectPrefabs) {
+            var generatedPrefab = Instantiate(prefab, generateObjectParent);
 
-            generatedNavigation.SetActive(!_isSceneInitializing);
+            generatedPrefab.SetActive(!_isSceneInitializing);
 
-            _generatedNavigations.Add(generatedNavigation);
+            gameObjectInstances.Add(generatedPrefab);
         }
-    }
-
-    private Vector3 GetDefaultNavigationPositionFromPlayer( Vector3 playerPosition ) {
-        var navigationPosition = playerPosition + (player.transform.forward * navigationObjectOffsetFromPlayer.z);  // move forward
-        navigationPosition.y += navigationObjectOffsetFromPlayer.y; // put it down
-
-        return navigationPosition;
     }
 
     private Vector3 GetRandomRangeFromPlayer( Vector3 playerPosition ) {
@@ -192,9 +201,9 @@ public class GM : MonoBehaviour {
 
         initScreen.SetActive(isInitializing);
 
-        SceneHelper.SetGameObjectsActive(ref stickers, !isInitializing);
-        SceneHelper.SetGameObjectsActive(ref _generatedNavigations, !isInitializing);
-        SceneHelper.SetGameObjectsActive(ref _generatedFindObjects, !isInitializing);
+        ObjectHelper.SetGameObjectsActive(ref _generatedStickers, !isInitializing);
+        ObjectHelper.SetGameObjectsActive(ref _generatedNavigations, !isInitializing);
+        ObjectHelper.SetGameObjectsActive(ref _generatedFindObjects, !isInitializing);
     }
     #endregion UI
 
@@ -208,14 +217,14 @@ public class GM : MonoBehaviour {
     }
 
     public void Hologram_OnClick( object sender, HologramClickEventArgs e ) {
-        SceneHelper.SetCollidersActive(ref _generatedPlanesCollider, e.isClicked);
+        ObjectHelper.SetCollidersActive(ref _generatedPlanesCollider, e.isClicked);
 
 #if UNITY_EDITOR
         Debug.LogFormat("Hologram {0}", e.isClicked ? "clicked" : "unclicked");
 #endif
     }
 
-    public void Plane_OnChangeProcessingState(object sender, SpatialProcessingEventArgs e) {
+    public void Plane_OnChangeProcessingState( object sender, SpatialProcessingEventArgs e ) {
         if (!e.isProcessing) {
             SetSceneInit(false);
         }
@@ -224,6 +233,19 @@ public class GM : MonoBehaviour {
     }
 
     public void Restart_OnTrigger( object sender, RestartEventArgs e ) {
+        if (generateObjectToFind) {
+            if (setObjectToFindRandomPosition) {
+                GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition), objectToFindParent, true);
+            } else {
+                GenerateObjectToFind(GetRangeFromPlayer(_playerPosition), objectToFindParent, true);
+            }
+        }
+
+        if (_isFindObjectGenerated) {
+            _measurements.ForEach(g => g.SetMeasurementTo(_generatedFindObjects[0]));
+            _trackings.ForEach(g => g.SetTrackingTo(_generatedFindObjects[0]));
+        }
+
         Debug.Log("Restart");
     }
     #endregion Handlers

@@ -9,7 +9,7 @@ public enum LayerName {
     RaycastSpatialMapping = 1 << 31
 }
 
-public class LayerHelper : MonoBehaviour {
+public class LayerHelper {
     public static List<GameObject> FindObjectsInLayer( GameObject root, LayerName layer ) {
         var objects = new List<GameObject>() { root };
 
