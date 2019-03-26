@@ -4,13 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.SpatialMapping;
 
+public class CreateFindObjectEventArgs : EventArgs {
+    public GameObject createdObject;
+}
+
 public class RestartEventArgs : EventArgs { }
 
 public class GM : MonoBehaviour {
     public static EventHandler<RestartEventArgs> OnRestart;
+    public static EventHandler<CreateFindObjectEventArgs> OnCreateObjectToFind;
 
     public GameObject player;
     public GameObject initScreen;
+    public GameObject spatialMapping;
+    public GameObject spatialProcessing;
 
     [Header("Settings")]
     public bool generateObjectToFind = true;
@@ -61,6 +68,7 @@ public class GM : MonoBehaviour {
     }
 
     private void Start() {
+        SetActiveSpatialObjects(false);
         SetSceneInit(true);
 
         UpdatePlayerPosition();
@@ -74,6 +82,8 @@ public class GM : MonoBehaviour {
 
             setObjectToFindRandomPosition = true;
         }
+
+        SetActiveSpatialObjects(true);
 
         if (generateNavigations) {
             GenerateObjects(navigations, ref _generatedNavigations, navigationObjectParent);
@@ -103,19 +113,23 @@ public class GM : MonoBehaviour {
 
     private void GenerateObjectToFind( Vector3 positionToGenerate, Transform generationParent, bool generateOnlyOne = false ) {
         if (generateOnlyOne) {
-            _generatedFindObjects.ForEach(g => Destroy(g));
+            //_generatedFindObjects.ForEach(g => Destroy(g));
 
-            _generatedFindObjects.Clear();
+            //_generatedFindObjects.Clear();
 
-            _isFindObjectGenerated = false;
+            _generatedFindObjects[0].transform.position = positionToGenerate;
+            OnCreateObjectToFind(this, new CreateFindObjectEventArgs() { createdObject = _generatedFindObjects[0] });
+
+            //_isFindObjectGenerated = false;
         }
 
-        if (findObject) {
+        if (findObject && !generateOnlyOne) {
             var generatedObject = Instantiate(findObject, positionToGenerate, Quaternion.identity, generationParent);
 
             generatedObject.SetActive(!_isSceneInitializing);
 
             _generatedFindObjects.Add(generatedObject);
+            
 
             _isFindObjectGenerated = true;
         }
@@ -167,9 +181,7 @@ public class GM : MonoBehaviour {
         return playerPosition + findObjectGenerateDistanceFromPlayer;
     }
 
-    private void UpdateGeneratedSurfacesCollider( SpatialMappingSource.SurfaceObject surface ) {
-        var surfaceCollider = surface.Collider;
-
+    private void UpdateGeneratedSurfacesCollider( Collider surfaceCollider ) {
         surfaceCollider.enabled = false;
 
         _generatedSurfacesCollider.Add(surfaceCollider);
@@ -195,6 +207,11 @@ public class GM : MonoBehaviour {
 #endif
     }
 
+    private void SetActiveSpatialObjects( bool isActive ) {
+        spatialMapping.SetActive(isActive);
+        spatialProcessing.SetActive(isActive);
+    }
+
     #region UI
     private void SetSceneInit( bool isInitializing ) {
         _isSceneInitializing = isInitializing;
@@ -208,15 +225,15 @@ public class GM : MonoBehaviour {
     #endregion UI
 
     #region Handlers
-    public void Surface_OnCreate( object sender, SurfaceEventArgs e ) {
-        UpdateGeneratedSurfacesCollider(e.surfaceObject);
+    private void Surface_OnCreate( object sender, SurfaceEventArgs e ) {
+        UpdateGeneratedSurfacesCollider(e.surfaceObject.Collider);
     }
 
-    public void Plane_OnCreate( object sender, PlanesEventArgs e ) {
+    private void Plane_OnCreate( object sender, PlanesEventArgs e ) {
         UpdateGeneratedPlanesCollider(e.planeObject);
     }
 
-    public void Hologram_OnClick( object sender, HologramClickEventArgs e ) {
+    private void Hologram_OnClick( object sender, HologramClickEventArgs e ) {
         ObjectHelper.SetCollidersActive(ref _generatedPlanesCollider, e.isClicked);
 
 #if UNITY_EDITOR
@@ -224,7 +241,7 @@ public class GM : MonoBehaviour {
 #endif
     }
 
-    public void Plane_OnChangeProcessingState( object sender, SpatialProcessingEventArgs e ) {
+    private void Plane_OnChangeProcessingState( object sender, SpatialProcessingEventArgs e ) {
         if (!e.isProcessing) {
             SetSceneInit(false);
         }
@@ -232,7 +249,7 @@ public class GM : MonoBehaviour {
         Debug.LogFormat("Scene initializion {0}", e.isProcessing ? "started" : "ended");
     }
 
-    public void Restart_OnTrigger( object sender, RestartEventArgs e ) {
+    private void Restart_OnTrigger( object sender, RestartEventArgs e ) {
         if (generateObjectToFind) {
             if (setObjectToFindRandomPosition) {
                 GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition), objectToFindParent, true);

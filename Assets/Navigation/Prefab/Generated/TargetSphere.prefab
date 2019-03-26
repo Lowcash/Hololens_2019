@@ -133,7 +133,7 @@ MonoBehaviour:
   scaleDifferenceToFullTransparency: 0.5
   scaleDirection: 0
   speedOfTransition: 0.2
-  countOfWaves: 3
+  countOfWaves: 2
 --- !u!135 &135078486862923466
 SphereCollider:
   m_ObjectHideFlags: 1

@@ -16,7 +16,5 @@
 				Pass Replace
 			}
 		}
-
-		UsePass "Transparent/Diffuse/FORWARD"
 	}
 }
