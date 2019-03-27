@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.SpatialMapping;
 
-public class CreateFindObjectEventArgs : EventArgs {
+public class ChangeFindObjectTransformEventArgs : EventArgs {
     public GameObject createdObject;
 }
 
@@ -12,7 +12,7 @@ public class RestartEventArgs : EventArgs { }
 
 public class GM : MonoBehaviour {
     public static EventHandler<RestartEventArgs> OnRestart;
-    public static EventHandler<CreateFindObjectEventArgs> OnCreateObjectToFind;
+    public static EventHandler<ChangeFindObjectTransformEventArgs> OnChangeFindObjectTransform;
 
     public GameObject player;
     public GameObject initScreen;
@@ -25,15 +25,12 @@ public class GM : MonoBehaviour {
     public bool generateStickers = true;
     public bool setObjectToFindRandomPosition = false;
 
+    [Header("Distance settings")]
     public Vector3 findObjectGenerateDistanceFromPlayer;
 
-    [Header("Sticker UI")]
-    public List<GameObject> stickers = new List<GameObject>();
-
     [Header("Object to generate")]
-    public GameObject findObject;
-
-    [Header("Navigation")]
+    public List<GameObject> objectsToFind = new List<GameObject>();
+    public List<GameObject> stickers = new List<GameObject>();
     public List<GameObject> navigations = new List<GameObject>();
 
     [Header("Generate object parents")]
@@ -41,9 +38,6 @@ public class GM : MonoBehaviour {
     public Transform navigationObjectParent;
     public Transform UIParent;
 
-    private Vector3 _playerPosition;
-
-    private bool _isFindObjectGenerated;
     private bool _isSceneInitializing;
 
     private List<GameObject> _generatedFindObjects = new List<GameObject>();
@@ -71,13 +65,17 @@ public class GM : MonoBehaviour {
         SetActiveSpatialObjects(false);
         SetSceneInit(true);
 
-        UpdatePlayerPosition();
+        if (generateNavigations)
+            GenerateObjects(navigations, ref _generatedNavigations, navigationObjectParent);
+
+        if (generateStickers)
+            GenerateObjects(stickers, ref _generatedStickers, UIParent);
 
         if (generateObjectToFind) {
             if (setObjectToFindRandomPosition) {
-                GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition), objectToFindParent);
+                GenerateObjectToFind(objectsToFind[0], GetRandomRangeFromPlayer(player.transform.position), objectToFindParent);
             } else {
-                GenerateObjectToFind(GetRangeFromPlayer(_playerPosition), objectToFindParent);
+                GenerateObjectToFind(objectsToFind[0], GetRangeFromPlayer(player.transform.position), objectToFindParent);
             }
 
             setObjectToFindRandomPosition = true;
@@ -85,21 +83,11 @@ public class GM : MonoBehaviour {
 
         SetActiveSpatialObjects(true);
 
-        if (generateNavigations) {
-            GenerateObjects(navigations, ref _generatedNavigations, navigationObjectParent);
-        }
-
-        if (generateStickers) {
-            GenerateObjects(stickers, ref _generatedStickers, UIParent);
-        }
-
         AssignManagingProperties(_generatedNavigations);
         AssignManagingProperties(_generatedStickers);
 
-        if (_isFindObjectGenerated) {
-            _measurements.ForEach(g => g.SetMeasurementTo(_generatedFindObjects[0]));
-            _trackings.ForEach(g => g.SetTrackingTo(_generatedFindObjects[0]));
-        }
+        _measurements.ForEach(g => g.SetMeasurementTo(_generatedFindObjects[0]));
+        _trackings.ForEach(g => g.SetTrackingTo(_generatedFindObjects[0]));
 
         _measurements.ForEach(g => g.StartMeasuring());
         _trackings.ForEach(g => g.StartTracking());
@@ -107,32 +95,20 @@ public class GM : MonoBehaviour {
         _positionings.ForEach(p => p.StartPositioning());
     }
 
-    private void UpdatePlayerPosition() {
-        _playerPosition = player.transform.position;
+    private void UpdateFindObjectPositon( ref GameObject objectToFind, Vector3 newPosition ) {
+        objectToFind.transform.position = newPosition;
+
+        OnChangeFindObjectTransform(this, new ChangeFindObjectTransformEventArgs() { createdObject = objectToFind });
     }
 
-    private void GenerateObjectToFind( Vector3 positionToGenerate, Transform generationParent, bool generateOnlyOne = false ) {
-        if (generateOnlyOne) {
-            //_generatedFindObjects.ForEach(g => Destroy(g));
+    private void GenerateObjectToFind( GameObject objectToFind, Vector3 positionToGenerate, Transform generationParent ) {
+        var generatedObject = Instantiate(objectToFind, generationParent);
 
-            //_generatedFindObjects.Clear();
+        UpdateFindObjectPositon(ref generatedObject, positionToGenerate);
 
-            _generatedFindObjects[0].transform.position = positionToGenerate;
-            OnCreateObjectToFind(this, new CreateFindObjectEventArgs() { createdObject = _generatedFindObjects[0] });
+        generatedObject.SetActive(!_isSceneInitializing);
 
-            //_isFindObjectGenerated = false;
-        }
-
-        if (findObject && !generateOnlyOne) {
-            var generatedObject = Instantiate(findObject, positionToGenerate, Quaternion.identity, generationParent);
-
-            generatedObject.SetActive(!_isSceneInitializing);
-
-            _generatedFindObjects.Add(generatedObject);
-            
-
-            _isFindObjectGenerated = true;
-        }
+        _generatedFindObjects.Add(generatedObject);
     }
 
     private void AssignManagingProperties( List<GameObject> objects ) {
@@ -143,25 +119,19 @@ public class GM : MonoBehaviour {
                 var visualizing = item.GetComponent<Visualizing>();
                 var positioning = item.GetComponent<Positioning>();
 
-                if (tracking) {
+                if (tracking)
                     _trackings.Add(tracking);
-                }
-                if (measurement) {
+                if (measurement)
                     _measurements.Add(measurement);
-                }
-                if (visualizing) {
+                if (visualizing)
                     _visualizings.Add(visualizing);
-                }
-                if (positioning) {
+                if (positioning)
                     _positionings.Add(positioning);
-                }
             }
         }
     }
 
     private void GenerateObjects( List<GameObject> gameObjectPrefabs, ref List<GameObject> gameObjectInstances, Transform generateObjectParent ) {
-        var playerPosition = player.transform.position;
-
         foreach (var prefab in gameObjectPrefabs) {
             var generatedPrefab = Instantiate(prefab, generateObjectParent);
 
@@ -242,25 +212,20 @@ public class GM : MonoBehaviour {
     }
 
     private void Plane_OnChangeProcessingState( object sender, SpatialProcessingEventArgs e ) {
-        if (!e.isProcessing) {
-            SetSceneInit(false);
-        }
+        if (!e.isProcessing) { SetSceneInit(false); }
 
         Debug.LogFormat("Scene initializion {0}", e.isProcessing ? "started" : "ended");
     }
 
     private void Restart_OnTrigger( object sender, RestartEventArgs e ) {
         if (generateObjectToFind) {
-            if (setObjectToFindRandomPosition) {
-                GenerateObjectToFind(GetRandomRangeFromPlayer(_playerPosition), objectToFindParent, true);
-            } else {
-                GenerateObjectToFind(GetRangeFromPlayer(_playerPosition), objectToFindParent, true);
-            }
-        }
+            var generatedObject = _generatedFindObjects[0];
 
-        if (_isFindObjectGenerated) {
-            _measurements.ForEach(g => g.SetMeasurementTo(_generatedFindObjects[0]));
-            _trackings.ForEach(g => g.SetTrackingTo(_generatedFindObjects[0]));
+            if (setObjectToFindRandomPosition) {
+                UpdateFindObjectPositon(ref generatedObject, GetRandomRangeFromPlayer(player.transform.position));
+            } else {
+                UpdateFindObjectPositon(ref generatedObject, GetRangeFromPlayer(player.transform.position));
+            }
         }
 
         Debug.Log("Restart");

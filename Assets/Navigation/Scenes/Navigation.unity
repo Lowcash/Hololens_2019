@@ -282,9 +282,10 @@ MonoBehaviour:
   generateStickers: 1
   setObjectToFindRandomPosition: 0
   findObjectGenerateDistanceFromPlayer: {x: 0, y: 0, z: 3}
+  objectsToFind:
+  - {fileID: 1852205765583846, guid: edd3ef650e2288a49a87a3808477060e, type: 2}
   stickers:
   - {fileID: 1150901991419236, guid: d20426e07f136e247b2f5cfb14fd78f2, type: 2}
-  findObject: {fileID: 1852205765583846, guid: edd3ef650e2288a49a87a3808477060e, type: 2}
   navigations:
   - {fileID: 1521308289151756, guid: 67f40e818e447754fb8bc55bd58532f1, type: 2}
   - {fileID: 1170319383021200, guid: 8f40ffb2478157e49862f35da50809d5, type: 2}

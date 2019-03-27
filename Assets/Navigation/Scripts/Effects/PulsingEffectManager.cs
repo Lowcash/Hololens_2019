@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PulsingEffectManager : MonoBehaviour {
-    public enum ScaleDirection { FORWARD, BACKWARD }
+    public enum ScaleDirection { Forward, Backward }
 
     [Header("Pulse object")]
     public GameObject objectToScale;
-    public GameObject objectsStencil;
 
     [Header("Scale settings")]
     public float fromScale = 0.0f;
@@ -23,6 +22,7 @@ public class PulsingEffectManager : MonoBehaviour {
     public int countOfWaves = 5;
 
     private Vector3 _defaultScale;
+    private Vector3 _pulseToPosition;
 
     private float _cameraDistanceScale;
     private float _scaleBetweenWaves;
@@ -36,13 +36,12 @@ public class PulsingEffectManager : MonoBehaviour {
     private List<GameObject> _scaleObjects = new List<GameObject>();
 
     private List<ShaderExtensionEffectManager> _objectsShaderManagers = new List<ShaderExtensionEffectManager>();
-    private List<ShaderExtensionEffectManager> _stencilShaderManagers = new List<ShaderExtensionEffectManager>();
 
     private List<Renderer> _roomRenderers = new List<Renderer>();
 
     private void Awake() {
         SpatialMappingObserver.OnSurfaceCreate += Surface_OnCreate;
-        GM.OnCreateObjectToFind += ObjectToFind_OnCreate;
+        GM.OnChangeFindObjectTransform += ObjectToFind_OnChangeTransform;
     }
 
     private void Start() {
@@ -69,16 +68,16 @@ public class PulsingEffectManager : MonoBehaviour {
 
     private void UpdateScale( ScaleDirection direction ) {
         for (int i = 0; i < countOfWaves; i++) {
-            _actualScales[i] += (Time.deltaTime * speedOfTransition) * (direction == ScaleDirection.FORWARD ? -1 : 1);
+            _actualScales[i] += (Time.deltaTime * speedOfTransition) * (direction == ScaleDirection.Forward ? -1 : 1);
 
             // reset wave position
             switch (direction) {
-                case ScaleDirection.FORWARD:
+                case ScaleDirection.Forward:
                     _actualScales[i] = _actualScales[i] < fromScale ? toScale : _actualScales[i];
 
                     break;
 
-                case ScaleDirection.BACKWARD:
+                case ScaleDirection.Backward:
                     _actualScales[i] = _actualScales[i] > toScale ? fromScale : _actualScales[i];
 
                     break;
@@ -87,8 +86,6 @@ public class PulsingEffectManager : MonoBehaviour {
             _scaleObjects[i].transform.localScale = _defaultScale * _actualScales[i] * _cameraDistanceScale;
 
             _renderedScales[i] = _actualScales[i] * _cameraDistanceScale - _roomRenderers[0].sharedMaterial.GetFloat("_WaveWidth");
-
-            //_scaleStencils[i].transform.localScale = scale;
         }
 
         for (int i = 0; i < _roomRenderers.Count; i++) {
@@ -100,13 +97,9 @@ public class PulsingEffectManager : MonoBehaviour {
         for (int i = 0; i < countOfWaves; i++) {
             if (_actualScales[i] < fromScale + scaleDifferenceToFullTransparency) {
                 _objectsShaderManagers[i].SetTransparency(GetInterpolatedValueFromRange(fromScale, fromScale + scaleDifferenceToFullTransparency, _actualScales[i]));
-
-                //_stencilShaderManagers[i].SetTransparency(1 - GetInterpolatedValueFromRange(fromScale, fromScale + scaleDifferenceToFullTransparency, _actualScales[i]));
             }
             if (_actualScales[i] > toScale - scaleDifferenceToFullTransparency) {
                 _objectsShaderManagers[i].SetTransparency(GetInterpolatedValueFromRange(toScale, toScale - scaleDifferenceToFullTransparency, _actualScales[i]));
-
-                //_stencilShaderManagers[i].SetTransparency(1 - GetInterpolatedValueFromRange(toScale, toScale - scaleDifferenceToFullTransparency, _actualScales[i]));
             }
         }
     }
@@ -131,15 +124,10 @@ public class PulsingEffectManager : MonoBehaviour {
             var generatedObject = Instantiate(objectToScale, transform);
             generatedObject.transform.localScale *= scale;
 
-            //var generatedStencil = Instantiate(objectsStencil, transform);
-            generatedObject.transform.localScale *= scale;
-
             _scaleObjects.Add(generatedObject);
-            //_scaleStencils.Add(generatedStencil);
             _actualScales.Add(scale);
             _renderedScales.Add(scale);
             _objectsShaderManagers.Add(generatedObject.GetComponent<ShaderExtensionEffectManager>());
-            //_stencilShaderManagers.Add(generatedStencil.GetComponent<ShaderExtensionEffectManager>());
         }
     }
 
@@ -152,20 +140,23 @@ public class PulsingEffectManager : MonoBehaviour {
         _actualScales.Clear();
         _renderedScales.Clear();
         _objectsShaderManagers.Clear();
-        _stencilShaderManagers.Clear();
     }
 
     private void Surface_OnCreate( object sender, SurfaceEventArgs e ) {
         UpdateGeneratedSurfacesRenderer(e.surfaceObject.Renderer);
     }
 
-    private void ObjectToFind_OnCreate( object sender, CreateFindObjectEventArgs e ) {
-        _roomRenderers.ForEach(r => r.sharedMaterial.SetVector("_Position", e.createdObject.transform.position));
+    private void ObjectToFind_OnChangeTransform( object sender, ChangeFindObjectTransformEventArgs e ) {
+        _pulseToPosition = e.createdObject.transform.position;
+
+        _roomRenderers.ForEach(r => r.sharedMaterial.SetVector("_Position", _pulseToPosition));
     }
 
     private void UpdateGeneratedSurfacesRenderer( Renderer renderer ) {
+        renderer.sharedMaterial.SetVector("_Position", _pulseToPosition);
+
         _roomRenderers.Add(renderer);
-        
+
 #if UNITY_EDITOR
         Debug.LogFormat("{0} renderer was added to Pulsing effect renderer referencies", renderer.name);
 #endif
