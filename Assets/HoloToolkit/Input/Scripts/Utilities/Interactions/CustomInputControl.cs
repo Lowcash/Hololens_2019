@@ -1,15 +1,21 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
-
+using System;
 using UnityEngine;
 
 namespace HoloToolkit.Unity.InputModule
 {
+    public enum InputHand { Left, Right }
+
     /// <summary>
     /// Class for manually controlling inputs when running in the Unity editor.
     /// </summary>
     public class CustomInputControl : MonoBehaviour
     {
+        public static Action<InputHand> OnMenuButtonClicked;
+
+        public InputHand inputHand = InputHand.Left;
+
         public float ControllerReturnFactor = 0.25f;  /// [0.0,1.0] the closer this is to one the faster it brings the hand back to center
         public float ControllerTimeBeforeReturn = 0.5f;
 
@@ -54,6 +60,8 @@ namespace HoloToolkit.Unity.InputModule
         private int mainTexId;
 
         private float timeBeforeReturn;
+
+        private bool menuPressed = false;
 
         private void Awake()
         {
@@ -107,6 +115,15 @@ namespace HoloToolkit.Unity.InputModule
             if (MenuButtonControl)
             {
                 ControllerSourceState.MenuPressed = MenuButtonControl.Pressed();
+
+                if (!menuPressed && ControllerSourceState.MenuPressed) {
+                    OnMenuButtonClicked(inputHand);
+
+                    menuPressed = true;
+                }
+                else if(menuPressed && !ControllerSourceState.MenuPressed) {
+                    menuPressed = false;
+                }
             }
 
             if (GraspControl)

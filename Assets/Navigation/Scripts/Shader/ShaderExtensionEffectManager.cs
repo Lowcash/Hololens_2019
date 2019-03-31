@@ -2,17 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ShaderPropertyType {
-    Float
-}
+public enum RenderingMode { Default, Opaque = 0, TransparentCutout, Transparent, PremultipliedTransparent, Additive, Custom }
 
 public class ShaderExtensionEffectManager : MonoBehaviour {
     public Shader shaderToModify;
 
+    [Header("Change materials")]
+    public Material defaultMaterial;
+    public Material switchToMaterial;
+
     private Renderer _renderer;
+
+    private RenderingMode defaultRenderingMode;
 
     private void Awake() {
         _renderer = GetComponent<Renderer>();
+
+        if (_renderer.material.HasProperty("_Mode")) {
+            defaultRenderingMode = (RenderingMode)_renderer.material.GetInt("_Mode");
+        }
     }
 
     public void SetTransparency( float transparency ) {
@@ -30,28 +38,18 @@ public class ShaderExtensionEffectManager : MonoBehaviour {
         }
     }
 
-    public void SetPropertyArray( string name, List<float> values, ShaderPropertyType propertyType ) {
-        switch (propertyType) {
-            case ShaderPropertyType.Float:
-                _renderer.material.SetFloatArray(name, values);
+    public void ChangeRenderingModeTo( RenderingMode renderingMode ) {
+        if (_renderer.material.HasProperty("_Mode")) {
+            if (renderingMode == RenderingMode.Default) {
+                _renderer.material = defaultMaterial;
 
-                break;
-        }
-    }
-
-    public void SetProperty( string name, float value, ShaderPropertyType propertyType ) {
-        if (_renderer.material.HasProperty(name)) {
-            switch (propertyType) {
-                case ShaderPropertyType.Float:
-                    _renderer.material.SetFloat(name, value);
-
-                    break;
+                //_renderer.material.SetInt("_Mode", (int)defaultRenderingMode);
+                //_renderer.material.SetFloat("_RenderQueueOverride", -1.0f);
+            } else {
+                _renderer.material = switchToMaterial;
+                //_renderer.material.SetInt("_Mode", (int)renderingMode);
+                //_renderer.material.SetFloat("_RenderQueueOverride", 0.0f);
             }
-        } else {
-
-#if UNITY_EDITOR
-            Debug.Log("Wrong shader was set!");
-#endif
         }
     }
 }

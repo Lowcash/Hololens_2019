@@ -1,14 +1,25 @@
 ﻿using System;
 using UnityEngine;
+using HoloToolkit.Unity.InputModule;
 
 public class Settings : MonoBehaviour {
-    public static EventHandler<EventArgs> OnClickHideSettings;
+    public FadeEffectManager fadeEffectManagerScript;
 
-    public void OnRestartButtonClick() {
-        GM.OnRestart(this, new RestartEventArgs());
+    private void Awake() {
+        CustomInputControl.OnMenuButtonClicked += OnMenuButtonClicked;
     }
 
-    public void OnHideSettingsButtonClick() {
-        OnClickHideSettings(this, EventArgs.Empty);
+    private void OnRestartButtonClick() {
+        GM.OnRestart();
+    }
+
+    private void OnHideSettingsButtonClick() {
+        fadeEffectManagerScript.StartFade(FadeEffectManager.FadeDirection.FadeOut);
+    }
+
+    private void OnMenuButtonClicked(InputHand inputHand) {
+        PositionTo.OnTriggerStateApply();
+
+        fadeEffectManagerScript.StartFade(FadeEffectManager.FadeDirection.FadeIn);
     }
 }

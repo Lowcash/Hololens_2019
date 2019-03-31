@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FadeEffectManager : MonoBehaviour {
     public enum FadeDirection { FadeIn, FadeOut }
+
+    public float speedOfTransition = 0.05f;
 
     private float _alphaValue = 1;
 
@@ -13,11 +16,10 @@ public class FadeEffectManager : MonoBehaviour {
     private Coroutine _fadeInCoroutine;
     private Coroutine _fadeOutCoroutine;
 
-    private readonly List<Renderer> _allChildRenderers = new List<Renderer>();
-
-    private void Awake() {
-        Settings.OnClickHideSettings += StartFade;
-    }
+    private readonly List<Renderer> _childrenRenderers = new List<Renderer>();
+    private readonly List<Text> _childrenTexts = new List<Text>();
+    private readonly List<Color> _childrenDefaultColors = new List<Color>();
+    private readonly List<ShaderExtensionEffectManager> _childrenShaderExtensionManagers = new List<ShaderExtensionEffectManager>();
 
     private void Start() {
         var allChildren = LayerHelper.FindObjectsInLayer(gameObject, LayerName.UI);
@@ -26,19 +28,38 @@ public class FadeEffectManager : MonoBehaviour {
             Renderer renderer;
 
             if ((renderer = child.GetComponent<Renderer>()) != null) {
-                _allChildRenderers.Add(renderer);
+                _childrenRenderers.Add(renderer);
+                _childrenDefaultColors.Add(renderer.material.color);
+
+                ShaderExtensionEffectManager shaderExtensionEffectManager;
+
+                if ((shaderExtensionEffectManager = child.GetComponent<ShaderExtensionEffectManager>()) != null) {
+                    _childrenShaderExtensionManagers.Add(shaderExtensionEffectManager);
+                }
+            }
+
+            Text text;
+
+            if ((text = child.GetComponent<Text>()) != null) {
+                _childrenTexts.Add(text);
             }
         }
     }
 
-    private void StartFade( object sender, EventArgs e ) {
-        if (_nextFade == FadeDirection.FadeOut) {
+    public void StartFade() {
+        StartFade(_nextFade);
+    }
+
+    public void StartFade( FadeDirection fadeDirectionState ) {
+        if (fadeDirectionState == FadeDirection.FadeOut) {
             if (_fadeInCoroutine != null) { StopCoroutine(_fadeInCoroutine); }
 
             _fadeOutCoroutine = StartCoroutine(FadeOut());
 
             _nextFade = FadeDirection.FadeIn;
-        } else if (_nextFade == FadeDirection.FadeIn) {
+        } else if (fadeDirectionState == FadeDirection.FadeIn) {
+            if (!gameObject.activeSelf) { gameObject.SetActive(true); }
+
             if (_fadeOutCoroutine != null) { StopCoroutine(_fadeOutCoroutine); }
 
             _fadeInCoroutine = StartCoroutine(FadeIn());
@@ -48,30 +69,60 @@ public class FadeEffectManager : MonoBehaviour {
     }
 
     private IEnumerator FadeIn() {
-        for (; _alphaValue <= 1; _alphaValue += 0.05f) {
-            foreach (var renderer in _allChildRenderers) {
-                var color = renderer.material.color;
+        for (; _alphaValue <= 1; _alphaValue += speedOfTransition) {
+            for (int i = 0; i < _childrenRenderers.Count; i++) {
+                var color = _childrenRenderers[i].material.color;
 
-                color.a = _alphaValue;
+                if (_alphaValue < _childrenDefaultColors[i].a && color.a < 1) {
+                    color.a = _alphaValue;
 
-                renderer.material.color = color;
+                    _childrenRenderers[i].material.color = color;
+                }
+            }
+
+            for (int i = 0; i < _childrenTexts.Count; i++) {
+                var color = _childrenTexts[i].color;
+
+                if (color.a < 1) {
+                    color.a = _alphaValue;
+
+                    _childrenTexts[i].color = color;
+                }
             }
 
             yield return new WaitForSeconds(0.05f);
         }
+
+        _childrenShaderExtensionManagers.ForEach(m => m.ChangeRenderingModeTo(RenderingMode.Default));
     }
 
     private IEnumerator FadeOut() {
-        for (; _alphaValue >= -0.05f; _alphaValue -= 0.05f) {
-            foreach (var renderer in _allChildRenderers) {
-                var color = renderer.material.color;
+        _childrenShaderExtensionManagers.ForEach(m => m.ChangeRenderingModeTo(RenderingMode.Transparent));
 
-                color.a = _alphaValue;
+        for (; _alphaValue >= -speedOfTransition; _alphaValue -= speedOfTransition) {
+            for (int i = 0; i < _childrenRenderers.Count; i++) {
+                var color = _childrenRenderers[i].material.color;
 
-                renderer.material.color = color;
+                if (_alphaValue < _childrenDefaultColors[i].a && color.a > 0) {
+                    color.a = _alphaValue;
+
+                    _childrenRenderers[i].material.color = color;
+                }
+            }
+
+            for (int i = 0; i < _childrenTexts.Count; i++) {
+                var color = _childrenTexts[i].color;
+
+                if (color.a > 0) {
+                    color.a = _alphaValue;
+
+                    _childrenTexts[i].color = color;
+                }
             }
 
             yield return new WaitForSeconds(0.05f);
         }
+
+        gameObject.SetActive(false);
     }
 }

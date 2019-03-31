@@ -283,8 +283,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1860a0159f684ae4bb431273cfc33509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  translation: {x: 0, y: -0.2, z: 2}
-  applyOnStates: 00000000
+  isApplyOnAwakeState: 1
+  isApplyOnStartState: 0
+  isApplyOnUpdateState: 0
+  isApplyOnTriggerState: 0
+  awakeStateTranslation: {x: 0, y: -0.25, z: 2}
+  startStateTranslation: {x: 0, y: 0, z: 0}
+  updateStateTranslation: {x: 0, y: 0, z: 0}
+  triggerStateTranslation: {x: 0, y: 0, z: 0}
   positioningFromPlayer: 1
   applyPlayerRotation: 1
 --- !u!114 &114982196595577088
@@ -299,3 +305,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderToModify: {fileID: 4800000, guid: 6f6329401b0f4a34ea734a0ac90baafc, type: 3}
+  defaultMaterial: {fileID: 0}
+  switchToMaterial: {fileID: 0}

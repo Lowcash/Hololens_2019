@@ -303,10 +303,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1860a0159f684ae4bb431273cfc33509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  translation: {x: 0, y: -0.2, z: 2}
-  applyOnStates: 00000000
-  isFromPlayer: 1
-  isApplyPlayerRotation: 0
+  isApplyOnAwakeState: 1
+  isApplyOnStartState: 0
+  isApplyOnUpdateState: 0
+  isApplyOnTriggerState: 0
+  awakeStateTranslation: {x: 0, y: -0.25, z: 2}
+  startStateTranslation: {x: 0, y: 0, z: 0}
+  updateStateTranslation: {x: 0, y: 0, z: 0}
+  triggerStateTranslation: {x: 0, y: 0, z: 0}
+  positioningFromPlayer: 1
+  applyPlayerRotation: 1
 --- !u!114 &114354797085004942
 MonoBehaviour:
   m_ObjectHideFlags: 1

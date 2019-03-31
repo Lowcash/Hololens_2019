@@ -123,6 +123,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4194483692163280}
   - component: {fileID: 65068210439201792}
+  - component: {fileID: 114284129486792242}
   - component: {fileID: 114830700887680706}
   - component: {fileID: 114424356968104534}
   - component: {fileID: 114457053570729870}
@@ -179,6 +180,7 @@ GameObject:
   - component: {fileID: 4363951661206842}
   - component: {fileID: 33776005572304070}
   - component: {fileID: 23211242852643674}
+  - component: {fileID: 114026964417353186}
   m_Layer: 5
   m_Name: BackPlate
   m_TagString: Untagged
@@ -380,6 +382,7 @@ GameObject:
   - component: {fileID: 4202442231589552}
   - component: {fileID: 33520203923515902}
   - component: {fileID: 23095482594570428}
+  - component: {fileID: 114835191997430544}
   m_Layer: 5
   m_Name: BackPlate
   m_TagString: Untagged
@@ -868,7 +871,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 065576a4a22e85e43989d72e33aa2789, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1126,6 +1129,20 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &114026964417353186
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1491808302639002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c9f834be81d8a54db9a23d8a8399403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shaderToModify: {fileID: 4800000, guid: d45c0efca53019e43891b0f610f8146e, type: 3}
+  defaultMaterial: {fileID: 2100000, guid: df4abdb025f6c11489a7f77f9fba8659, type: 2}
+  switchToMaterial: {fileID: 2100000, guid: 00e64808c42142848aeff5d3c3f1259d, type: 2}
 --- !u!114 &114028160851707764
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1270,6 +1287,17 @@ MonoBehaviour:
   requireGaze: 1
   MainCollider: {fileID: 65861526510670908}
   MainRenderer: {fileID: 23095482594570428}
+--- !u!114 &114284129486792242
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1150901991419236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9edc4e8ab35ffc498d5a78c33db1cd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114303197905164668
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1652,6 +1680,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 188d52625ce3cc741aecfaf415dc6d7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeEffectManagerScript: {fileID: 114284129486792242}
+--- !u!114 &114835191997430544
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1997608649852156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c9f834be81d8a54db9a23d8a8399403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shaderToModify: {fileID: 4800000, guid: d45c0efca53019e43891b0f610f8146e, type: 3}
+  defaultMaterial: {fileID: 2100000, guid: df4abdb025f6c11489a7f77f9fba8659, type: 2}
+  switchToMaterial: {fileID: 2100000, guid: 00e64808c42142848aeff5d3c3f1259d, type: 2}
 --- !u!114 &114835461796849140
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1684,10 +1727,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1860a0159f684ae4bb431273cfc33509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  translation: {x: 0, y: 0, z: 3}
-  applyOnStates: 00000000
+  isApplyOnAwakeState: 1
+  isApplyOnStartState: 0
+  isApplyOnUpdateState: 0
+  isApplyOnTriggerState: 1
+  isApplyOnAwakePlayerRotation: 0
+  isApplyOnStartPlayerRotation: 0
+  isApplyOnUpdatePlayerRotation: 0
+  isApplyOnTriggerPlayerRotation: 1
+  awakeStateTranslation: {x: 0, y: 0, z: 3}
+  startStateTranslation: {x: 0, y: 0, z: 0}
+  updateStateTranslation: {x: 0, y: 0, z: 0}
+  triggerStateTranslation: {x: 0, y: 0, z: 3}
   positioningFromPlayer: 1
-  applyPlayerRotation: 0
 --- !u!114 &114897563076372910
 MonoBehaviour:
   m_ObjectHideFlags: 1

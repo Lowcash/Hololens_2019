@@ -8,11 +8,9 @@ public class ChangeFindObjectTransformEventArgs : EventArgs {
     public GameObject createdObject;
 }
 
-public class RestartEventArgs : EventArgs { }
-
 public class GM : MonoBehaviour {
-    public static EventHandler<RestartEventArgs> OnRestart;
     public static EventHandler<ChangeFindObjectTransformEventArgs> OnChangeFindObjectTransform;
+    public static Action OnRestart;
 
     public GameObject player;
     public GameObject initScreen;
@@ -217,7 +215,7 @@ public class GM : MonoBehaviour {
         Debug.LogFormat("Scene initializion {0}", e.isProcessing ? "started" : "ended");
     }
 
-    private void Restart_OnTrigger( object sender, RestartEventArgs e ) {
+    private void Restart_OnTrigger() {
         if (generateObjectToFind) {
             var generatedObject = _generatedFindObjects[0];
 

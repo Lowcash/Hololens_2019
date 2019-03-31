@@ -1,45 +1,66 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 public class PositionTo : PositioningProperty {
-    public Vector3 translation;
+    public static Action OnTriggerStateApply;
 
-    public List<ObjectHelper.ObjectLifeState> applyOnStates = new List<ObjectHelper.ObjectLifeState>() { ObjectHelper.ObjectLifeState.Awake };
+    public bool isApplyOnAwakeState = false;
+    public bool isApplyOnStartState = false;
+    public bool isApplyOnUpdateState = false;
+    public bool isApplyOnTriggerState = false;
 
-    [Header("Player")]
+    public bool isApplyOnAwakePlayerRotation = false;
+    public bool isApplyOnStartPlayerRotation = false;
+    public bool isApplyOnUpdatePlayerRotation = false;
+    public bool isApplyOnTriggerPlayerRotation = false;
+
+    public Vector3 awakeStateTranslation;
+    public Vector3 startStateTranslation;
+    public Vector3 updateStateTranslation;
+    public Vector3 triggerStateTranslation;
+
     public bool positioningFromPlayer = true;
-    public bool applyPlayerRotation = true;
-
-    private bool _isApplyOnAwakeState = false;
-    private bool _isApplyOnStartState = false;
-    private bool _isApplyOnUpdateState = false;
 
     private void Awake() {
-        _isApplyOnAwakeState = applyOnStates.Contains(ObjectHelper.ObjectLifeState.Awake);
-        _isApplyOnStartState = applyOnStates.Contains(ObjectHelper.ObjectLifeState.Start);
-        _isApplyOnUpdateState = applyOnStates.Contains(ObjectHelper.ObjectLifeState.Life);
+        if (isApplyOnAwakeState) {
+            SetPosition(awakeStateTranslation);
 
-        if (_isApplyOnAwakeState) {
-            SetPosition();
-
-            if (applyPlayerRotation) { transform.SetParent(Camera.main.transform); }
+            if (isApplyOnAwakePlayerRotation) { transform.SetParent(Camera.main.transform); }
         }
+
+        if (isApplyOnTriggerState) { OnTriggerStateApply += OnTriggerStateActivate; }
     }
 
     private void Start() {
-        if (_isApplyOnStartState) {
-            SetPosition();
+        if (isApplyOnStartState) {
+            SetPosition(startStateTranslation);
 
-            if (applyPlayerRotation) { transform.SetParent(Camera.main.transform); }
+            if (isApplyOnStartPlayerRotation) { transform.SetParent(Camera.main.transform); }
         }
     }
 
     private void Update() {
-        if (_isApplyOnUpdateState) { SetPosition(); }
+        if (isApplyOnUpdateState) { SetPosition(updateStateTranslation); }
     }
 
-    private void SetPosition() {
+    private void OnTriggerStateActivate() {
+        if (isApplyOnTriggerState) {
+            if (isApplyOnTriggerPlayerRotation) {
+                var parent = transform.parent;
+
+                transform.SetParent(Camera.main.transform);
+
+                transform.localRotation = Quaternion.identity;
+                transform.localPosition = triggerStateTranslation;
+
+                transform.SetParent(parent);
+            } else {
+                SetPosition(triggerStateTranslation);
+            }           
+        }
+    }
+
+    private void SetPosition(Vector3 translation) {
         var position = transform.position;
 
         if (positioningFromPlayer) {
