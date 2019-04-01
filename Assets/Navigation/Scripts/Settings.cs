@@ -4,6 +4,7 @@ using HoloToolkit.Unity.InputModule;
 
 public class Settings : MonoBehaviour {
     public FadeEffectManager fadeEffectManagerScript;
+    public PositionTo positionToScript;
 
     private void Awake() {
         CustomInputControl.OnMenuButtonClicked += OnMenuButtonClicked;
@@ -18,8 +19,10 @@ public class Settings : MonoBehaviour {
     }
 
     private void OnMenuButtonClicked(InputHand inputHand) {
-        PositionTo.OnTriggerStateApply();
+        if (fadeEffectManagerScript.GetFadeState() == FadeEffectManager.FadeDirection.FadeOut) {
+            positionToScript.ApplyPositioning();
 
-        fadeEffectManagerScript.StartFade(FadeEffectManager.FadeDirection.FadeIn);
+            fadeEffectManagerScript.StartFade(FadeEffectManager.FadeDirection.FadeIn);
+        }
     }
 }

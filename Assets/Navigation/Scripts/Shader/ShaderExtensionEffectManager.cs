@@ -4,10 +4,16 @@ using UnityEngine;
 
 public enum RenderingMode { Default, Opaque = 0, TransparentCutout, Transparent, PremultipliedTransparent, Additive, Custom }
 
+public enum MaterialType { Material, SharedMaterial }
+
 public class ShaderExtensionEffectManager : MonoBehaviour {
     public Shader shaderToModify;
 
     [Header("Change materials")]
+    public MaterialType materialType = MaterialType.Material;
+
+    public string renderModePropertyName;
+
     public Material defaultMaterial;
     public Material switchToMaterial;
 
@@ -18,9 +24,8 @@ public class ShaderExtensionEffectManager : MonoBehaviour {
     private void Awake() {
         _renderer = GetComponent<Renderer>();
 
-        if (_renderer.material.HasProperty("_Mode")) {
-            defaultRenderingMode = (RenderingMode)_renderer.material.GetInt("_Mode");
-        }
+        if (_renderer.material.HasProperty(renderModePropertyName))
+            defaultRenderingMode = (RenderingMode)_renderer.material.GetInt(renderModePropertyName);
     }
 
     public void SetTransparency( float transparency ) {
@@ -39,16 +44,19 @@ public class ShaderExtensionEffectManager : MonoBehaviour {
     }
 
     public void ChangeRenderingModeTo( RenderingMode renderingMode ) {
-        if (_renderer.material.HasProperty("_Mode")) {
-            if (renderingMode == RenderingMode.Default) {
-                _renderer.material = defaultMaterial;
+        if (_renderer.material.HasProperty(renderModePropertyName)) {
+            switch (materialType) {
+                case MaterialType.Material: {
+                    _renderer.material = (renderingMode == RenderingMode.Default) ? defaultMaterial : switchToMaterial;
+                }
 
-                //_renderer.material.SetInt("_Mode", (int)defaultRenderingMode);
-                //_renderer.material.SetFloat("_RenderQueueOverride", -1.0f);
-            } else {
-                _renderer.material = switchToMaterial;
-                //_renderer.material.SetInt("_Mode", (int)renderingMode);
-                //_renderer.material.SetFloat("_RenderQueueOverride", 0.0f);
+                break;
+
+                case MaterialType.SharedMaterial: {
+                    _renderer.sharedMaterial = (renderingMode == RenderingMode.Default) ? defaultMaterial : switchToMaterial;
+                }
+
+                break;
             }
         }
     }

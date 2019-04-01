@@ -2,8 +2,6 @@
 using UnityEngine;
 
 public class PositionTo : PositioningProperty {
-    public static Action OnTriggerStateApply;
-
     public bool isApplyOnAwakeState = false;
     public bool isApplyOnStartState = false;
     public bool isApplyOnUpdateState = false;
@@ -27,8 +25,6 @@ public class PositionTo : PositioningProperty {
 
             if (isApplyOnAwakePlayerRotation) { transform.SetParent(Camera.main.transform); }
         }
-
-        if (isApplyOnTriggerState) { OnTriggerStateApply += OnTriggerStateActivate; }
     }
 
     private void Start() {
@@ -43,7 +39,7 @@ public class PositionTo : PositioningProperty {
         if (isApplyOnUpdateState) { SetPosition(updateStateTranslation); }
     }
 
-    private void OnTriggerStateActivate() {
+    public void ApplyPositioning() {
         if (isApplyOnTriggerState) {
             if (isApplyOnTriggerPlayerRotation) {
                 var parent = transform.parent;
@@ -56,7 +52,7 @@ public class PositionTo : PositioningProperty {
                 transform.SetParent(parent);
             } else {
                 SetPosition(triggerStateTranslation);
-            }           
+            }
         }
     }
 

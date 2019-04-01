@@ -1141,6 +1141,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderToModify: {fileID: 4800000, guid: d45c0efca53019e43891b0f610f8146e, type: 3}
+  materialType: 0
+  renderModePropertyName: _Mode
   defaultMaterial: {fileID: 2100000, guid: df4abdb025f6c11489a7f77f9fba8659, type: 2}
   switchToMaterial: {fileID: 2100000, guid: 00e64808c42142848aeff5d3c3f1259d, type: 2}
 --- !u!114 &114028160851707764
@@ -1298,6 +1300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9edc4e8ab35ffc498d5a78c33db1cd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speedOfTransition: 0.25
 --- !u!114 &114303197905164668
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1681,6 +1684,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeEffectManagerScript: {fileID: 114284129486792242}
+  positionToScript: {fileID: 114850343467337700}
 --- !u!114 &114835191997430544
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1693,6 +1697,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderToModify: {fileID: 4800000, guid: d45c0efca53019e43891b0f610f8146e, type: 3}
+  materialType: 0
+  renderModePropertyName: _Mode
   defaultMaterial: {fileID: 2100000, guid: df4abdb025f6c11489a7f77f9fba8659, type: 2}
   switchToMaterial: {fileID: 2100000, guid: 00e64808c42142848aeff5d3c3f1259d, type: 2}
 --- !u!114 &114835461796849140

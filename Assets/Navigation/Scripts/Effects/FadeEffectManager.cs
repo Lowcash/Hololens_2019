@@ -9,16 +9,16 @@ public class FadeEffectManager : MonoBehaviour {
 
     public float speedOfTransition = 0.05f;
 
-    private float _alphaValue = 1;
-
-    private FadeDirection _nextFade = FadeDirection.FadeOut;
+    private float _alphaValue = 1.0f;
 
     private Coroutine _fadeInCoroutine;
     private Coroutine _fadeOutCoroutine;
 
-    private readonly List<Renderer> _childrenRenderers = new List<Renderer>();
-    private readonly List<Text> _childrenTexts = new List<Text>();
+    private FadeDirection _nextFade = FadeDirection.FadeOut;
+
     private readonly List<Color> _childrenDefaultColors = new List<Color>();
+    private readonly List<Text> _childrenTexts = new List<Text>();
+    private readonly List<Renderer> _childrenRenderers = new List<Renderer>();
     private readonly List<ShaderExtensionEffectManager> _childrenShaderExtensionManagers = new List<ShaderExtensionEffectManager>();
 
     private void Start() {
@@ -40,9 +40,8 @@ public class FadeEffectManager : MonoBehaviour {
 
             Text text;
 
-            if ((text = child.GetComponent<Text>()) != null) {
+            if ((text = child.GetComponent<Text>()) != null)
                 _childrenTexts.Add(text);
-            }
         }
     }
 
@@ -58,17 +57,25 @@ public class FadeEffectManager : MonoBehaviour {
 
             _nextFade = FadeDirection.FadeIn;
         } else if (fadeDirectionState == FadeDirection.FadeIn) {
-            if (!gameObject.activeSelf) { gameObject.SetActive(true); }
+            if (!gameObject.activeSelf) {
+                gameObject.SetActive(true);
 
-            if (_fadeOutCoroutine != null) { StopCoroutine(_fadeOutCoroutine); }
+                if (_fadeOutCoroutine != null) { StopCoroutine(_fadeOutCoroutine); }
 
-            _fadeInCoroutine = StartCoroutine(FadeIn());
+                _fadeInCoroutine = StartCoroutine(FadeIn());
 
-            _nextFade = FadeDirection.FadeOut;
+                _nextFade = FadeDirection.FadeOut;
+            }
         }
     }
 
+    public FadeDirection GetFadeState() {
+        return _nextFade == FadeDirection.FadeIn ? FadeDirection.FadeOut : FadeDirection.FadeIn;
+    }
+
     private IEnumerator FadeIn() {
+        gameObject.SetActive(true);
+
         for (; _alphaValue <= 1; _alphaValue += speedOfTransition) {
             for (int i = 0; i < _childrenRenderers.Count; i++) {
                 var color = _childrenRenderers[i].material.color;
