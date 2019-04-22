@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System;
 using UnityEngine;
 
 namespace HoloToolkit.Unity.SpatialMapping
@@ -14,12 +13,8 @@ namespace HoloToolkit.Unity.SpatialMapping
         [Tooltip("If greater than or equal to zero, surface objects will claim to be updated at this period. This is useful when working with libraries that respond to updates (such as the SpatialUnderstanding library). If negative, surfaces will not claim to be updated.")]
         public float SimulatedUpdatePeriodInSeconds = -1;
 
-        private SpatialMappingObserver _spatialMappingObserverScript;
-
         private void Start()
         {
-            _spatialMappingObserverScript = GetComponent<SpatialMappingObserver>();
-
 #if UNITY_2017_2_OR_NEWER
             if (!UnityEngine.XR.XRDevice.isPresent && Application.isEditor)
 #else
@@ -42,8 +37,6 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// <param name="roomModel">The room model to load meshes from.</param>
         public void Load(GameObject roomModel)
         {
-            //EventHandler<SurfaceEventArgs> OnSurfaceCreate;
-
             if (roomModel == null)
             {
                 Debug.Log("No room model specified.");
@@ -70,11 +63,6 @@ namespace HoloToolkit.Unity.SpatialMapping
 
                     newSurfaceObject.Object.transform.localPosition = meshFilter.transform.position;
                     newSurfaceObject.Object.transform.localRotation = meshFilter.transform.rotation;
-
-                    newSurfaceObject.Object.layer = (int)_spatialMappingObserverScript.CreateWithLayer;
-                    newSurfaceObject.Collider.enabled = false;
-
-                    SpatialMappingObserver.OnSurfaceCreate(this, new SurfaceEventArgs() { surfaceObject = newSurfaceObject });
 
                     AddSurfaceObject(newSurfaceObject);
                 }

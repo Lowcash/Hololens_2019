@@ -52,11 +52,6 @@ namespace HoloToolkit.Unity.SpatialMapping
         Sphere = 2
     }
 
-    public class SurfaceEventArgs : EventArgs
-    {
-        public SpatialMappingSource.SurfaceObject surfaceObject;
-    }
-
     /// <summary>
     /// The SpatialMappingObserver class encapsulates the SurfaceObserver into an easy to use
     /// object that handles managing the observed surfaces and the rendering of surface geometry.
@@ -74,17 +69,12 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// </summary>
         public ObserverStates ObserverState { get; private set; }
 
-        public LayerName CreateWithLayer = LayerName.SpatialMapping;
-
-        public static EventHandler<SurfaceEventArgs> OnSurfaceCreate;
-
         /// <summary>
         /// Indicates the current type of the observed volume
         /// </summary>
         [SerializeField]
         [Tooltip("The shape of the observation volume.")]
         private ObserverVolumeTypes observerVolumeType = ObserverVolumeTypes.AxisAlignedBox;
-
         public ObserverVolumeTypes ObserverVolumeType
         {
             get
@@ -251,12 +241,10 @@ namespace HoloToolkit.Unity.SpatialMapping
                         Debug.Assert(newSurface.Object.transform.parent == transform);
                         newSurface.ID = surfaceID.handle;
                         newSurface.Renderer.enabled = false;
+
                         worldAnchor = newSurface.Object.GetComponent<WorldAnchor>();
                         Debug.Assert(worldAnchor != null);
                     }
-
-                    newSurface.Object.layer = (int)CreateWithLayer;
-                    newSurface.Collider.enabled = false;
 
                     var surfaceData = new SurfaceData(
                         surfaceID,
@@ -266,8 +254,6 @@ namespace HoloToolkit.Unity.SpatialMapping
                         TrianglesPerCubicMeter,
                         _bakeCollider: true
                         );
-
-                    OnSurfaceCreate(this, new SurfaceEventArgs() { surfaceObject = newSurface });
 
                     if (observer.RequestMeshAsync(surfaceData, SurfaceObserver_OnDataReady))
                     {

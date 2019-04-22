@@ -24,6 +24,9 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
     private int _numColliders;
 
     private Ray _ray = new Ray();
+    private Ray _cameraRay = new Ray();
+    private RaycastHit _hit;
+    private RaycastHit _cameraHit;
 
     private Rigidbody _rb;
     private Collider _tapTriggerCollider;
@@ -51,14 +54,45 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
     private void Update() {
         if (_handDraggableScript.MoveDirection != Vector3.zero) {
             _ray.origin = transform.position;
-            _ray.direction = _handDraggableScript.MoveDirection;
+            _ray.direction = transform.forward;
+
+//            if (_isPlaced) {
+//                if (Physics.Raycast(_ray, out _hit, directionToPlaceHologram, (int)LayerName.RaycastSpatialMapping)) {
+//                    //SetHologramBehaviour();
+
+//                    Debug.LogFormat("Hologram hit: {0}", _hit.transform.name);
+//                }
+
+//#if UNITY_EDITOR
+//                Debug.DrawLine(_ray.origin, _ray.origin + (_ray.direction * directionToPlaceHologram), Color.red);
+//#endif
+
+//                _cameraRay.origin = Camera.main.transform.position;
+//                _cameraRay.direction = Camera.main.transform.forward;
+
+//                if (Physics.Raycast(_cameraRay, out _cameraHit, Int32.MaxValue, (int)LayerName.RaycastSpatialMapping)) {
+//                    Debug.LogFormat("Camera hit: {0}", _cameraHit.transform.name);
+//                }
+
+//#if UNITY_EDITOR
+//                Debug.DrawLine(_cameraRay.origin, _cameraRay.origin + (_cameraRay.direction * 3), Color.green);
+//#endif
+
+//                if (_hit.transform.name != _cameraHit.transform.name) {
+//                    SetHologramBehaviour();
+//                }
+//            }
         }
 
-#if UNITY_EDITOR
-        Debug.DrawLine(_ray.origin, _ray.origin + (_ray.direction * directionToPlaceHologram), Color.red);
-#endif
-
         UpdateInterpolatorPosition();
+    }
+
+    private void SetHologramBehaviour() {
+        if (_numColliders == 1) {
+            PlaceHologram();
+        } else if (_numColliders == 0) {
+            UnPlaceHologram();
+        }
     }
 
     private void OnTriggerEnter( Collider other ) {
@@ -67,9 +101,7 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
 
             _numColliders++;
 
-            if (_numColliders == 1) {
-                PlaceHologram();
-            }
+            SetHologramBehaviour();
         }
     }
 
@@ -77,9 +109,7 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
         if (other.gameObject.layer == (int)LayerName.SpatialMapping) {
             _numColliders--;
 
-            if (_numColliders == 0) {
-                UnPlaceHologram();
-            }
+            SetHologramBehaviour();
         }
     }
 
@@ -129,9 +159,8 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
     }
 
     private void UpdateInterpolatorPosition() {
-        if (_numColliders == 0) {
+        if (!_isPlaced)
             _interpolatorScript.SetTargetLocalPosition(gameObject.transform.position);
-        }
     }
 
     private void PrepareHologramForButtons() {

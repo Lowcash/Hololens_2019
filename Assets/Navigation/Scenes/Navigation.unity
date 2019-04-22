@@ -186,7 +186,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 335019591}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 22750479}
@@ -275,8 +275,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 22750478}
   initScreen: {fileID: 1553114232}
-  spatialMapping: {fileID: 820051561}
-  spatialProcessing: {fileID: 1325178175}
   generateObjectToFind: 1
   generateNavigations: 1
   generateStickers: 1
@@ -438,11 +436,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!1 &820051561 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1000010302963436, guid: 2ed75ffdf9031c94e8bce4b3d17b9928,
-    type: 2}
-  m_PrefabInternal: {fileID: 1243038804}
 --- !u!1 &1082454644
 GameObject:
   m_ObjectHideFlags: 0
@@ -698,7 +691,7 @@ Prefab:
       objectReference: {fileID: 2100000, guid: 89b6d54101a54ca47ad4c8ff8918bece, type: 2}
     - target: {fileID: 1000010302963436, guid: 2ed75ffdf9031c94e8bce4b3d17b9928, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114000012149591842, guid: 2ed75ffdf9031c94e8bce4b3d17b9928,
         type: 2}

@@ -14,8 +14,6 @@ public class GM : MonoBehaviour {
 
     public GameObject player;
     public GameObject initScreen;
-    public GameObject spatialMapping;
-    public GameObject spatialProcessing;
 
     [Header("Settings")]
     public bool generateObjectToFind = true;
@@ -36,6 +34,9 @@ public class GM : MonoBehaviour {
     public Transform navigationObjectParent;
     public Transform UIParent;
 
+    private SpatialMappingSource spatialMappingSource;
+    private SurfaceMeshesToPlanes surfaceMeshToPlane;
+
     private bool _isSceneInitializing;
 
     private List<GameObject> _generatedFindObjects = new List<GameObject>();
@@ -47,21 +48,26 @@ public class GM : MonoBehaviour {
     private List<Visualizing> _visualizings = new List<Visualizing>();
     private List<Positioning> _positionings = new List<Positioning>();
 
-    private List<Collider> _generatedSurfacesCollider = new List<Collider>();
-    private List<Collider> _generatedPlanesCollider = new List<Collider>();
+    private static List<Collider> _generatedSurfacesCollider = new List<Collider>();
+    private static List<Collider> _generatedPlanesCollider = new List<Collider>();
 
     private void Awake() {
-        SurfaceMeshesToPlanes.OnChangePlaneProcessingState += Plane_OnChangeProcessingState;
-        SurfaceMeshesToPlanes.OnPlaneCreate += Plane_OnCreate;
-        SpatialMappingObserver.OnSurfaceCreate += Surface_OnCreate;
+        OnRestart += Restart_OnTrigger;
+
         HologramBehaviour.OnClicked += Hologram_OnClick;
 
-        OnRestart += Restart_OnTrigger;
+        if((spatialMappingSource = SpatialMappingManager.Instance.Source) != null) {
+            spatialMappingSource.SurfaceAdded += Surface_OnAdded;
+        }
+
+        if((surfaceMeshToPlane = SurfaceMeshesToPlanes.Instance) != null) {
+            surfaceMeshToPlane.PlaneCreated += Plane_OnCreate;
+            surfaceMeshToPlane.MakePlanesComplete += Plane_OnChangeProcessingState;
+        }
     }
 
     private void Start() {
-        SetActiveSpatialObjects(false);
-        SetSceneInit(true);
+        //SetSceneInit(true);
 
         if (generateNavigations)
             GenerateObjects(navigations, ref _generatedNavigations, navigationObjectParent);
@@ -78,8 +84,6 @@ public class GM : MonoBehaviour {
 
             setObjectToFindRandomPosition = true;
         }
-
-        SetActiveSpatialObjects(true);
 
         AssignManagingProperties(_generatedNavigations);
         AssignManagingProperties(_generatedStickers);
@@ -149,7 +153,7 @@ public class GM : MonoBehaviour {
         return playerPosition + findObjectGenerateDistanceFromPlayer;
     }
 
-    private void UpdateGeneratedSurfacesCollider( Collider surfaceCollider ) {
+    private static void UpdateGeneratedSurfacesCollider( Collider surfaceCollider ) {
         surfaceCollider.enabled = false;
 
         _generatedSurfacesCollider.Add(surfaceCollider);
@@ -175,11 +179,6 @@ public class GM : MonoBehaviour {
 #endif
     }
 
-    private void SetActiveSpatialObjects( bool isActive ) {
-        spatialMapping.SetActive(isActive);
-        spatialProcessing.SetActive(isActive);
-    }
-
     #region UI
     private void SetSceneInit( bool isInitializing ) {
         _isSceneInitializing = isInitializing;
@@ -193,12 +192,12 @@ public class GM : MonoBehaviour {
     #endregion UI
 
     #region Handlers
-    private void Surface_OnCreate( object sender, SurfaceEventArgs e ) {
-        UpdateGeneratedSurfacesCollider(e.surfaceObject.Collider);
+    private static void Surface_OnAdded( object sender, DataEventArgs<SpatialMappingSource.SurfaceObject> e ) {
+        UpdateGeneratedSurfacesCollider(e.Data.Collider);
     }
 
-    private void Plane_OnCreate( object sender, PlanesEventArgs e ) {
-        UpdateGeneratedPlanesCollider(e.planeObject);
+    private void Plane_OnCreate( GameObject gameObject ) {
+        UpdateGeneratedPlanesCollider(gameObject);
     }
 
     private void Hologram_OnClick( object sender, HologramClickEventArgs e ) {
@@ -209,10 +208,10 @@ public class GM : MonoBehaviour {
 #endif
     }
 
-    private void Plane_OnChangeProcessingState( object sender, SpatialProcessingEventArgs e ) {
-        if (!e.isProcessing) { SetSceneInit(false); }
+    private void Plane_OnChangeProcessingState( object sender, EventArgs e ) {
+        SetSceneInit(false);
 
-        Debug.LogFormat("Scene initializion {0}", e.isProcessing ? "started" : "ended");
+        Debug.Log("Scene initializion ended");
     }
 
     private void Restart_OnTrigger() {

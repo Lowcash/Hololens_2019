@@ -40,7 +40,7 @@ public class PulsingEffectManager : MonoBehaviour {
     private List<Renderer> _roomRenderers = new List<Renderer>();
 
     private void Awake() {
-        SpatialMappingObserver.OnSurfaceCreate += Surface_OnCreate;
+        //SpatialMappingObserver.OnSurfaceCreate += Surface_OnCreate;
         GM.OnChangeFindObjectTransform += ObjectToFind_OnChangeTransform;
     }
 
@@ -85,7 +85,7 @@ public class PulsingEffectManager : MonoBehaviour {
 
             _scaleObjects[i].transform.localScale = _defaultScale * _actualScales[i] * _cameraDistanceScale;
 
-            _renderedScales[i] = _actualScales[i] * _cameraDistanceScale - _roomRenderers[0].sharedMaterial.GetFloat("_WaveWidth");
+             _renderedScales[i] = _actualScales[i] * _cameraDistanceScale - 1;
         }
 
         for (int i = 0; i < _roomRenderers.Count; i++) {
@@ -142,18 +142,18 @@ public class PulsingEffectManager : MonoBehaviour {
         _objectsShaderManagers.Clear();
     }
 
-    private void Surface_OnCreate( object sender, SurfaceEventArgs e ) {
+    /*private void Surface_OnCreate( object sender, SurfaceEventArgs e ) {
         UpdateGeneratedSurfacesRenderer(e.surfaceObject.Renderer);
-    }
+    }*/
 
     private void ObjectToFind_OnChangeTransform( object sender, ChangeFindObjectTransformEventArgs e ) {
         _pulseToPosition = e.createdObject.transform.position;
 
-        _roomRenderers.ForEach(r => r.sharedMaterial.SetVector("_Position", _pulseToPosition));
+        //_roomRenderers.ForEach(r => r.sharedMaterial.SetVector("_Position", _pulseToPosition));
     }
 
     private void UpdateGeneratedSurfacesRenderer( Renderer renderer ) {
-        renderer.sharedMaterial.SetVector("_Position", _pulseToPosition);
+        //renderer.sharedMaterial.SetVector("_Position", _pulseToPosition);
 
         _roomRenderers.Add(renderer);
 
