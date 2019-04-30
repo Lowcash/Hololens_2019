@@ -21,6 +21,8 @@ public class PulsingEffectManager : MonoBehaviour {
 
     public int countOfWaves = 5;
 
+    private SpatialMappingSource spatialMappingSource;
+
     private Vector3 _defaultScale;
     private Vector3 _pulseToPosition;
 
@@ -40,8 +42,13 @@ public class PulsingEffectManager : MonoBehaviour {
     private List<Renderer> _roomRenderers = new List<Renderer>();
 
     private void Awake() {
-        //SpatialMappingObserver.OnSurfaceCreate += Surface_OnCreate;
         GM.OnChangeFindObjectTransform += ObjectToFind_OnChangeTransform;
+
+        if ((spatialMappingSource = SpatialMappingManager.Instance.Source) != null) {
+            spatialMappingSource.GetMeshRenderers().ForEach(r => _roomRenderers.Add(r));
+
+            spatialMappingSource.SurfaceAdded += Surface_OnAdded;
+        }
     }
 
     private void Start() {
@@ -142,18 +149,21 @@ public class PulsingEffectManager : MonoBehaviour {
         _objectsShaderManagers.Clear();
     }
 
-    /*private void Surface_OnCreate( object sender, SurfaceEventArgs e ) {
-        UpdateGeneratedSurfacesRenderer(e.surfaceObject.Renderer);
-    }*/
+    private void Surface_OnAdded( object sender, DataEventArgs<SpatialMappingSource.SurfaceObject> e ) {
+        UpdateGeneratedSurfacesRenderer(e.Data.Renderer);
+    }
 
+    private void RoomSurface_OnAdded( SpatialMappingSource.SurfaceObject e ) {
+        UpdateGeneratedSurfacesRenderer(e.Renderer);
+    }
     private void ObjectToFind_OnChangeTransform( object sender, ChangeFindObjectTransformEventArgs e ) {
         _pulseToPosition = e.createdObject.transform.position;
 
-        //_roomRenderers.ForEach(r => r.sharedMaterial.SetVector("_Position", _pulseToPosition));
+        _roomRenderers.ForEach(r => r.sharedMaterial.SetVector("_Position", _pulseToPosition));
     }
 
     private void UpdateGeneratedSurfacesRenderer( Renderer renderer ) {
-        //renderer.sharedMaterial.SetVector("_Position", _pulseToPosition);
+        renderer.sharedMaterial.SetVector("_Position", _pulseToPosition);
 
         _roomRenderers.Add(renderer);
 

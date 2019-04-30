@@ -328,6 +328,22 @@ namespace HoloToolkit.Unity.SpatialMapping
         }
 
         /// <summary>
+        /// Gets all mesh colliders that have been created.
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<MeshCollider> GetMeshColliders() {
+            List<MeshCollider> meshColliders = new List<MeshCollider>();
+
+            for (int index = 0; index < surfaceObjectsWriteable.Count; index++) {
+                if (surfaceObjectsWriteable[index].Renderer != null) {
+                    meshColliders.Add(surfaceObjectsWriteable[index].Collider);
+                }
+            }
+
+            return meshColliders;
+        }
+
+        /// <summary>
         /// Saves all the currently created spatial source meshes in world space.
         /// </summary>
         /// <param name="fileName">Name to give the mesh file. Exclude path and extension.</param>

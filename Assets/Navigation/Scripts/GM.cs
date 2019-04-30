@@ -57,6 +57,8 @@ public class GM : MonoBehaviour {
         HologramBehaviour.OnClicked += Hologram_OnClick;
 
         if((spatialMappingSource = SpatialMappingManager.Instance.Source) != null) {
+            spatialMappingSource.GetMeshColliders().ForEach(c => _generatedSurfacesCollider.Add(c));
+
             spatialMappingSource.SurfaceAdded += Surface_OnAdded;
         }
 
@@ -163,7 +165,7 @@ public class GM : MonoBehaviour {
 #endif
     }
 
-    private void UpdateGeneratedPlanesCollider( GameObject plane ) {
+    public void UpdateGeneratedPlanesCollider( GameObject plane ) {
         var planeCollider = plane.GetComponent<Collider>();
         var planeRenderer = plane.GetComponent<Renderer>();
 

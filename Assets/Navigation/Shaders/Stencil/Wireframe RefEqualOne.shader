@@ -130,18 +130,20 @@ Shader "Custom/Stencil/Wireframe RefEqualOne"
 				// Fade out the alpha but not the color so we don't get any weird halo effects from
 				// a fade to a different color.
 				float4 color = I * _WireColor + (1 - I) * _BaseColor;
-				color.a = 0;
+				//color.a = 0;
 
 				float dist2 = distance(i.worldPos.xyz, _Position);
 
-				for (uint idx = 0; idx < 2; idx++) {
+				color.a = abs(sin(dist2 + _Time.y));
+
+				/*for (uint idx = 0; idx < 2; idx++) {
 					float waveMax = _Distances[idx] + _WaveWidth;
 					float waveMin = _Distances[idx] - _WaveWidth;
 
 					float value = (min(1 - (dist2 / waveMax), 1 - (waveMin / dist2)));
 
 					color.a = max(value, color.a);
-				}
+				}*/
 
 				return color;
 			}
