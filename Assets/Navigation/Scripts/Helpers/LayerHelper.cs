@@ -6,7 +6,8 @@ public enum LayerName {
     IgnoreRaycast = 2,
     UI = 5,
     SpatialMapping = 31,
-    RaycastSpatialMapping = 1 << 31
+    RaycastSpatialMapping = 1 << 31,
+    RaycastUI = 1 << 5
 }
 
 public class LayerHelper {

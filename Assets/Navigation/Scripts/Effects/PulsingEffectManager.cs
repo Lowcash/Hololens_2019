@@ -32,7 +32,6 @@ public class PulsingEffectManager : MonoBehaviour {
     private int _previousCountOfWaves = 5;
 
     private List<float> _actualScales = new List<float>();
-    private List<float> _renderedScales = new List<float>();
 
     private List<GameObject> _scaleStencils = new List<GameObject>();
     private List<GameObject> _scaleObjects = new List<GameObject>();
@@ -91,12 +90,6 @@ public class PulsingEffectManager : MonoBehaviour {
             }
 
             _scaleObjects[i].transform.localScale = _defaultScale * _actualScales[i] * _cameraDistanceScale;
-
-             _renderedScales[i] = _actualScales[i] * _cameraDistanceScale - 1;
-        }
-
-        for (int i = 0; i < _roomRenderers.Count; i++) {
-            _roomRenderers[i].sharedMaterial.SetFloatArray("_Distances", _renderedScales);
         }
     }
 
@@ -133,7 +126,6 @@ public class PulsingEffectManager : MonoBehaviour {
 
             _scaleObjects.Add(generatedObject);
             _actualScales.Add(scale);
-            _renderedScales.Add(scale);
             _objectsShaderManagers.Add(generatedObject.GetComponent<ShaderExtensionEffectManager>());
         }
     }
@@ -145,7 +137,6 @@ public class PulsingEffectManager : MonoBehaviour {
         _scaleObjects.Clear();
         _scaleStencils.Clear();
         _actualScales.Clear();
-        _renderedScales.Clear();
         _objectsShaderManagers.Clear();
     }
 

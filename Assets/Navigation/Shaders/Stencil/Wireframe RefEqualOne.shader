@@ -11,7 +11,6 @@ Shader "Custom/Stencil/Wireframe RefEqualOne"
 		_BaseColor("Base color", Color) = (0.0, 0.0, 0.0, 1.0)
 		_WireColor("Wire color", Color) = (1.0, 1.0, 1.0, 1.0)
 		_WireThickness("Wire thickness", Range(0, 800)) = 100
-		_WaveWidth("WaveWidth", Float) = 1
 		_Position("Position", Vector) = (0, 0, 0)
 	}
 		SubShader
@@ -46,8 +45,6 @@ Shader "Custom/Stencil/Wireframe RefEqualOne"
 			float4 _WireColor;
 			float3 _Position;
 			float _WireThickness;
-			float _Distances[10];
-			float _WaveWidth;
 
 			// Based on approach described in Shader-Based Wireframe Drawing (2008)
 			// http://orbit.dtu.dk/en/publications/id(13e2122d-bec7-48de-beca-03ce6ea1c3f1).html
@@ -130,20 +127,10 @@ Shader "Custom/Stencil/Wireframe RefEqualOne"
 				// Fade out the alpha but not the color so we don't get any weird halo effects from
 				// a fade to a different color.
 				float4 color = I * _WireColor + (1 - I) * _BaseColor;
-				//color.a = 0;
 
 				float dist2 = distance(i.worldPos.xyz, _Position);
 
-				color.a = abs(sin(dist2 + _Time.y));
-
-				/*for (uint idx = 0; idx < 2; idx++) {
-					float waveMax = _Distances[idx] + _WaveWidth;
-					float waveMin = _Distances[idx] - _WaveWidth;
-
-					float value = (min(1 - (dist2 / waveMax), 1 - (waveMin / dist2)));
-
-					color.a = max(value, color.a);
-				}*/
+				color.a = dist2 > 10 ? 0.0 : abs(sin(dist2 + _Time.y));
 
 				return color;
 			}

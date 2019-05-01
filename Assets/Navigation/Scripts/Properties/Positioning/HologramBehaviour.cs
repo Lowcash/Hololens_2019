@@ -20,6 +20,7 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
     public float directionToPlaceHologram = 1.0f;
 
     private bool _isPlaced = false;
+    private bool _isDragging = false;
 
     private int _numColliders;
 
@@ -52,47 +53,22 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
     }
 
     private void Update() {
-        if (_handDraggableScript.MoveDirection != Vector3.zero) {
-            _ray.origin = transform.position;
-            _ray.direction = transform.forward;
+        if (_isPlaced && _numColliders == 0) {
+            _ray.origin = Camera.main.transform.position;
+            _ray.direction = hologramDraggableObject.transform.position - Camera.main.transform.position;
 
-//            if (_isPlaced) {
-//                if (Physics.Raycast(_ray, out _hit, directionToPlaceHologram, (int)LayerName.RaycastSpatialMapping)) {
-//                    //SetHologramBehaviour();
+            var distance = Vector3.Distance(Camera.main.transform.position, hologramDraggableObject.transform.position);
 
-//                    Debug.LogFormat("Hologram hit: {0}", _hit.transform.name);
-//                }
+            Debug.DrawLine(_ray.origin, _ray.origin + (_ray.direction * distance), Color.blue);
 
-//#if UNITY_EDITOR
-//                Debug.DrawLine(_ray.origin, _ray.origin + (_ray.direction * directionToPlaceHologram), Color.red);
-//#endif
-
-//                _cameraRay.origin = Camera.main.transform.position;
-//                _cameraRay.direction = Camera.main.transform.forward;
-
-//                if (Physics.Raycast(_cameraRay, out _cameraHit, Int32.MaxValue, (int)LayerName.RaycastSpatialMapping)) {
-//                    Debug.LogFormat("Camera hit: {0}", _cameraHit.transform.name);
-//                }
-
-//#if UNITY_EDITOR
-//                Debug.DrawLine(_cameraRay.origin, _cameraRay.origin + (_cameraRay.direction * 3), Color.green);
-//#endif
-
-//                if (_hit.transform.name != _cameraHit.transform.name) {
-//                    SetHologramBehaviour();
-//                }
-//            }
+            if (Physics.Raycast(_ray, out _hit, distance)) {
+                if(_hit.transform.name == hologramDraggableObject.transform.name) {
+                    UnPlaceHologram();
+                }  
+            }
         }
 
         UpdateInterpolatorPosition();
-    }
-
-    private void SetHologramBehaviour() {
-        if (_numColliders == 1) {
-            PlaceHologram();
-        } else if (_numColliders == 0) {
-            UnPlaceHologram();
-        }
     }
 
     private void OnTriggerEnter( Collider other ) {
@@ -101,15 +77,15 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
 
             _numColliders++;
 
-            SetHologramBehaviour();
+            if (_numColliders == 1) {
+                PlaceHologram();
+            }
         }
     }
 
     private void OnTriggerExit( Collider other ) {
         if (other.gameObject.layer == (int)LayerName.SpatialMapping) {
             _numColliders--;
-
-            SetHologramBehaviour();
         }
     }
 
@@ -137,6 +113,8 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
         PrepareHologramForDragging();
 
         LayerHelper.SetObjetsLayer(ref _childObjects, LayerName.IgnoreRaycast);
+
+        _isDragging = true;
     }
 
     public void OnInputUp( InputEventData eventData ) {
@@ -151,6 +129,8 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
         }
 
         LayerHelper.SetObjetsLayer(ref _childObjects, LayerName.UI);
+
+        _isDragging = false;
     }
 
     private void UpdateTapTriggerTransform() {
@@ -166,9 +146,7 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
     private void PrepareHologramForButtons() {
         ResetCollidersCounter();
 
-        if (_rb) {
-            Destroy(_rb);
-        }
+        if (_rb) { Destroy(_rb); }
 
         _tapToPlaceScript.IsBeingPlaced = false;
         _tapTriggerCollider.enabled = false;
