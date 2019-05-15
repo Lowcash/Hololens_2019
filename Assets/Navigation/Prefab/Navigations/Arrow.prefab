@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 23846755539400296}
   - component: {fileID: 95863676459200366}
   - component: {fileID: 114982196595577088}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: ArrowRender
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4437384088780654}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: RenderWrapper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ GameObject:
   - component: {fileID: 114736203002382912}
   - component: {fileID: 114666309612108306}
   - component: {fileID: 114923947196603534}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: Arrow
   m_TagString: Tracking
   m_Icon: {fileID: 0}
@@ -287,12 +287,15 @@ MonoBehaviour:
   isApplyOnStartState: 0
   isApplyOnUpdateState: 0
   isApplyOnTriggerState: 0
+  isApplyOnAwakePlayerRotation: 0
+  isApplyOnStartPlayerRotation: 0
+  isApplyOnUpdatePlayerRotation: 0
+  isApplyOnTriggerPlayerRotation: 0
   awakeStateTranslation: {x: 0, y: -0.25, z: 2}
   startStateTranslation: {x: 0, y: 0, z: 0}
   updateStateTranslation: {x: 0, y: 0, z: 0}
   triggerStateTranslation: {x: 0, y: 0, z: 0}
   positioningFromPlayer: 1
-  applyPlayerRotation: 1
 --- !u!114 &114982196595577088
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -305,5 +308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderToModify: {fileID: 4800000, guid: 6f6329401b0f4a34ea734a0ac90baafc, type: 3}
+  materialType: 0
+  renderModePropertyName: 
   defaultMaterial: {fileID: 0}
   switchToMaterial: {fileID: 0}

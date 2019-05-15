@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class FadeEffectManager : MonoBehaviour {
     public enum FadeDirection { FadeIn, FadeOut }
 
+    public bool findOnlyInFirstLayer = false;
+
     public float speedOfTransition = 0.05f;
 
     private float _alphaValue = 1.0f;
@@ -22,7 +24,7 @@ public class FadeEffectManager : MonoBehaviour {
     private readonly List<ShaderExtensionEffectManager> _childrenShaderExtensionManagers = new List<ShaderExtensionEffectManager>();
 
     private void Start() {
-        var allChildren = LayerHelper.FindObjectsInLayer(gameObject, LayerName.UI);
+        var allChildren = LayerHelper.FindObjectsInLayer(gameObject, LayerName.UI, findOnlyInFirstLayer);
 
         foreach (var child in allChildren) {
             Renderer renderer;

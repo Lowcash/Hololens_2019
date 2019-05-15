@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33798678171286422}
   - component: {fileID: 135078486862923466}
   - component: {fileID: 23985029493896612}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: TargetSphereRender
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,8 +125,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectToScale: {fileID: 1353380736557630, guid: c7caeedb395d6f343b15f22e034b4ee8,
-    type: 2}
-  objectsStencil: {fileID: 1210353989966660, guid: edb8b7b1734d5d74cb573bb655b77a44,
     type: 2}
   fromScale: 0
   toScale: 1

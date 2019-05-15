@@ -20,12 +20,10 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
     public float directionToPlaceHologram = 1.0f;
 
     private bool _isPlaced = false;
-    private bool _isDragging = false;
 
     private int _numColliders;
 
     private Ray _ray = new Ray();
-    private Ray _cameraRay = new Ray();
     private RaycastHit _hit;
     private RaycastHit _cameraHit;
 
@@ -34,7 +32,6 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
 
     private Interpolator _interpolatorScript;
     private TapToPlace _tapToPlaceScript;
-    private HandDraggable _handDraggableScript;
 
     private List<GameObject> _childObjects = new List<GameObject>();
 
@@ -43,7 +40,6 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
 
         _interpolatorScript = hologramContentObject.GetComponent<Interpolator>();
         _tapToPlaceScript = hologramContentObject.GetComponent<TapToPlace>();
-        _handDraggableScript = hologramDraggableObject.GetComponent<HandDraggable>();
     }
 
     private void Start() {
@@ -112,9 +108,7 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
 
         PrepareHologramForDragging();
 
-        LayerHelper.SetObjetsLayer(ref _childObjects, LayerName.IgnoreRaycast);
-
-        _isDragging = true;
+        LayerHelper.SetObjetsLayer(ref _childObjects, LayerName.Navigation);
     }
 
     public void OnInputUp( InputEventData eventData ) {
@@ -129,8 +123,6 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
         }
 
         LayerHelper.SetObjetsLayer(ref _childObjects, LayerName.UI);
-
-        _isDragging = false;
     }
 
     private void UpdateTapTriggerTransform() {

@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33861169197092680}
   - component: {fileID: 23723953838176446}
   - component: {fileID: 114471195723625334}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: ForceFieldSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,3 +95,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderToModify: {fileID: 4800000, guid: 94e3bb0247185f842a5153fe0cd6ef74, type: 3}
+  materialType: 0
+  renderModePropertyName: 
+  defaultMaterial: {fileID: 0}
+  switchToMaterial: {fileID: 0}

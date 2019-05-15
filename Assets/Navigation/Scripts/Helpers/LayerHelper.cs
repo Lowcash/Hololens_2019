@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum LayerName {
     IgnoreRaycast = 2,
+    Navigation = 8,
     UI = 5,
     SpatialMapping = 31,
     RaycastSpatialMapping = 1 << 31,
@@ -11,7 +12,7 @@ public enum LayerName {
 }
 
 public class LayerHelper {
-    public static List<GameObject> FindObjectsInLayer( GameObject root, LayerName layer ) {
+    public static List<GameObject> FindObjectsInLayer( GameObject root, LayerName layer, bool findOnlyInFirstLayer = false ) {
         var objects = new List<GameObject>() { root };
 
         for (int i = 0; i < objects.Count; i++) {
@@ -20,6 +21,8 @@ public class LayerHelper {
                     objects.Add(t.gameObject);
                 }
             }
+
+            if (findOnlyInFirstLayer) { break; }
         }
 
         return objects;
