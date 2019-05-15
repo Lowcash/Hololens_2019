@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Tip
   - Tracking
+  - DistortionEffect
   layers:
   - Default
   - TransparentFX

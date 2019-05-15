@@ -24,7 +24,8 @@ public class DissapearByDistance : VisualizingProperty
     {
         if (_previousDistance != _actualDistance)
         {
-            SetObjectTransparency(Mathf.Max(GetDotRotation(), GetDistance()));
+            //SetObjectTransparency(Mathf.Max(GetDotRotation(), GetDistance()));
+            SetObjectTransparency(GetDistance());
 
             _previousDistance = _actualDistance;
         }

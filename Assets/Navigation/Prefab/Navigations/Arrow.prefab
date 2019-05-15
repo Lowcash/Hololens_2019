@@ -234,7 +234,7 @@ MonoBehaviour:
   objectRenderWrapper: {fileID: 1498368576751570}
   objectRender: {fileID: 1090932139296080}
   shaderExtensionEffectScript: {fileID: 114982196595577088}
-  distanceToStartDissapear: 0.5
+  distanceToStartDissapear: 2
 --- !u!114 &114666309612108306
 MonoBehaviour:
   m_ObjectHideFlags: 1
