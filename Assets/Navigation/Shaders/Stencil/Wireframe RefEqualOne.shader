@@ -45,6 +45,7 @@ Shader "Custom/Stencil/Wireframe RefEqualOne"
 			float4 _WireColor;
 			float3 _Position;
 			float _WireThickness;
+			int _Speed;
 
 			// Based on approach described in Shader-Based Wireframe Drawing (2008)
 			// http://orbit.dtu.dk/en/publications/id(13e2122d-bec7-48de-beca-03ce6ea1c3f1).html
@@ -130,7 +131,14 @@ Shader "Custom/Stencil/Wireframe RefEqualOne"
 
 				float dist2 = distance(i.worldPos.xyz, _Position);
 
-				color.a = dist2 > 10 ? 0.0 : abs(sin(dist2 + _Time.y));
+				float speed = 0.0;
+
+				if(_Speed == 1) { speed = _Time.x; }
+				if(_Speed == 2) { speed = _Time.y; }
+				if(_Speed == 3) { speed = _Time.z; }
+				if(_Speed == 4) { speed = _Time.w; }
+
+				color.a = dist2 > 10 ? 0.0 : abs(sin(dist2 + speed));
 
 				return color;
 			}

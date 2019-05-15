@@ -79,14 +79,14 @@ public class PulsingEffectManager : MonoBehaviour {
             // reset wave position
             switch (direction) {
                 case ScaleDirection.Forward:
-                    _actualScales[i] = _actualScales[i] < fromScale ? toScale : _actualScales[i];
+                _actualScales[i] = _actualScales[i] < fromScale ? toScale : _actualScales[i];
 
-                    break;
+                break;
 
                 case ScaleDirection.Backward:
-                    _actualScales[i] = _actualScales[i] > toScale ? fromScale : _actualScales[i];
+                _actualScales[i] = _actualScales[i] > toScale ? fromScale : _actualScales[i];
 
-                    break;
+                break;
             }
 
             _scaleObjects[i].transform.localScale = _defaultScale * _actualScales[i] * _cameraDistanceScale;
@@ -161,5 +161,13 @@ public class PulsingEffectManager : MonoBehaviour {
 #if UNITY_EDITOR
         Debug.LogFormat("{0} renderer was added to Pulsing effect renderer referencies", renderer.name);
 #endif
+    }
+
+    public void PulsingEffectSet( bool isSet ) {
+        _roomRenderers.ForEach(r => r.enabled = isSet);
+    }
+
+    public void PulsingSpeedSet( int speed ) {
+        _roomRenderers.ForEach(r => r.sharedMaterial.SetInt("_Speed", speed));
     }
 }

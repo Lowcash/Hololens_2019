@@ -1581,11 +1581,6 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 4f37668d794e3694c9ee36b62447d99b, type: 2}
-    - target: {fileID: 114830700887680706, guid: d20426e07f136e247b2f5cfb14fd78f2,
-        type: 2}
-      propertyPath: distortionObject
-      value: 
-      objectReference: {fileID: 331296980}
     - target: {fileID: 23575989864311104, guid: d20426e07f136e247b2f5cfb14fd78f2,
         type: 2}
       propertyPath: m_Materials.Array.data[0]

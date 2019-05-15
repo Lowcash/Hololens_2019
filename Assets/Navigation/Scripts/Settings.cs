@@ -20,7 +20,15 @@ public class Settings : MonoBehaviour {
     public SliderGestureControl strengthSliderControl;
     public SliderGestureControl timeSliderControl;
 
+    [Header("Pulsing")]
+    public GameObject pulsingObject;
+    public InteractiveToggle speed1;
+    public InteractiveToggle speed2;
+    public InteractiveToggle speed3;
+    public InteractiveToggle speed4;
+
     private DistortionManager _distortionManager;
+    private PulsingEffectManager _pulsingEffectManager;
     private SettingLayerState _actualSettingLayerState = SettingLayerState.MAIN;
 
     private void Awake() {
@@ -28,8 +36,11 @@ public class Settings : MonoBehaviour {
     }
 
     private void Start() {
-        distortionObject = GameObject.FindGameObjectWithTag("DistortionEffect");
-        _distortionManager = distortionObject.GetComponent<DistortionManager>();
+        if (distortionObject = GameObject.FindGameObjectWithTag("DistortionEffect"))
+            _distortionManager = distortionObject.GetComponent<DistortionManager>();
+
+        if (pulsingObject = GameObject.FindGameObjectWithTag("PulsingEffect"))
+            _pulsingEffectManager = pulsingObject.GetComponent<PulsingEffectManager>();
     }
 
     private void OnRestartButtonClick() {
@@ -41,7 +52,7 @@ public class Settings : MonoBehaviour {
         fullPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
     }
 
-    private void OnMenuButtonClicked(InputHand inputHand) {
+    private void OnMenuButtonClicked( InputHand inputHand ) {
         if (fullPanelFade.GetFadeState() == FadeEffectManager.FadeDirection.FadeOut) {
             positionToScript.ApplyPositioning();
 
@@ -68,17 +79,17 @@ public class Settings : MonoBehaviour {
 
         switch (_actualSettingLayerState) {
             case SettingLayerState.DISTORTION:
-                distorsionPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
+            distorsionPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
             break;
             case SettingLayerState.PULSE:
-                pulsePanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
+            pulsePanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
             break;
         }
     }
     #endregion
 
     #region Distortion
-    public void OnDistortionSet(bool isSet) {
+    public void OnDistortionSet( bool isSet ) {
         distortionObject.SetActive(isSet);
     }
 
@@ -89,6 +100,27 @@ public class Settings : MonoBehaviour {
     public void OnDistortionTimeChange() {
         _distortionManager.SetDistortionTime((int)timeSliderControl.SliderValue);
     }
+    #endregion
 
+    #region Pulsing
+    public void OnPulsingSet( bool isSet ) {
+        _pulsingEffectManager.PulsingEffectSet(isSet);
+    }
+
+    public void OnPulsingSpeedSet( int value ) {
+        speed1.SetSelection(false);
+        speed2.SetSelection(false);
+        speed3.SetSelection(false);
+        speed4.SetSelection(false);
+
+        switch (value) {
+            case 1: speed1.SetSelection(true); break;
+            case 2: speed2.SetSelection(true); break;
+            case 3: speed3.SetSelection(true); break;
+            case 4: speed4.SetSelection(true); break;
+        }
+
+        _pulsingEffectManager.PulsingSpeedSet(value);
+    }
     #endregion
 }
