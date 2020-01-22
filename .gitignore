@@ -35,3 +35,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 VS_App/
+/Assets/Navigation/Images/objednavka_files
+/Assets/Navigation/Images

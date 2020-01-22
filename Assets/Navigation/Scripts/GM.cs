@@ -11,6 +11,7 @@ public class ChangeFindObjectTransformEventArgs : EventArgs {
 public class GM : MonoBehaviour {
     public static EventHandler<ChangeFindObjectTransformEventArgs> OnChangeFindObjectTransform;
     public static Action OnRestart;
+    public static Action OnStickerGenerate;
 
     public GameObject player;
     public GameObject initScreen;
@@ -18,7 +19,7 @@ public class GM : MonoBehaviour {
     [Header("Settings")]
     public bool generateObjectToFind = true;
     public bool generateNavigations = true;
-    public bool generateStickers = true;
+    public bool generateMenu = true;
     public bool setObjectToFindRandomPosition = false;
 
     [Header("Distance settings")]
@@ -26,6 +27,7 @@ public class GM : MonoBehaviour {
 
     [Header("Object to generate")]
     public List<GameObject> objectsToFind = new List<GameObject>();
+    public List<GameObject> menus = new List<GameObject>();
     public List<GameObject> stickers = new List<GameObject>();
     public List<GameObject> navigations = new List<GameObject>();
 
@@ -42,6 +44,7 @@ public class GM : MonoBehaviour {
     private List<GameObject> _generatedFindObjects = new List<GameObject>();
     private List<GameObject> _generatedNavigations = new List<GameObject>();
     private List<GameObject> _generatedStickers = new List<GameObject>();
+    private List<GameObject> _generatedMenus = new List<GameObject>();
 
     private List<Tracking> _trackings = new List<Tracking>();
     private List<Measurement> _measurements = new List<Measurement>();
@@ -53,6 +56,7 @@ public class GM : MonoBehaviour {
 
     private void Awake() {
         OnRestart += Restart_OnTrigger;
+        OnStickerGenerate += StickerGenerate_OnTrigger;
 
         HologramBehaviour.OnClicked += Hologram_OnClick;
 
@@ -74,8 +78,8 @@ public class GM : MonoBehaviour {
         if (generateNavigations)
             GenerateObjects(navigations, ref _generatedNavigations, navigationObjectParent);
 
-        if (generateStickers)
-            GenerateObjects(stickers, ref _generatedStickers, UIParent);
+        if (generateMenu)
+            GenerateObjects(menus, ref _generatedMenus, UIParent);
 
         if (generateObjectToFind) {
             if (setObjectToFindRandomPosition) {
@@ -88,7 +92,7 @@ public class GM : MonoBehaviour {
         }
 
         AssignManagingProperties(_generatedNavigations);
-        AssignManagingProperties(_generatedStickers);
+        AssignManagingProperties(_generatedMenus);
 
         _measurements.ForEach(g => g.SetMeasurementTo(_generatedFindObjects[0]));
         _trackings.ForEach(g => g.SetTrackingTo(_generatedFindObjects[0]));
@@ -115,22 +119,26 @@ public class GM : MonoBehaviour {
         _generatedFindObjects.Add(generatedObject);
     }
 
+    private void AssignManagingProperties( GameObject gameObject ) {
+        var tracking = gameObject.GetComponent<Tracking>();
+        var measurement = gameObject.GetComponent<Measurement>();
+        var visualizing = gameObject.GetComponent<Visualizing>();
+        var positioning = gameObject.GetComponent<Positioning>();
+
+        if (tracking)
+            _trackings.Add(tracking);
+        if (measurement)
+            _measurements.Add(measurement);
+        if (visualizing)
+            _visualizings.Add(visualizing);
+        if (positioning)
+            _positionings.Add(positioning);
+    }
+
     private void AssignManagingProperties( List<GameObject> objects ) {
         foreach (var item in objects) {
             if (item) {
-                var tracking = item.GetComponent<Tracking>();
-                var measurement = item.GetComponent<Measurement>();
-                var visualizing = item.GetComponent<Visualizing>();
-                var positioning = item.GetComponent<Positioning>();
-
-                if (tracking)
-                    _trackings.Add(tracking);
-                if (measurement)
-                    _measurements.Add(measurement);
-                if (visualizing)
-                    _visualizings.Add(visualizing);
-                if (positioning)
-                    _positionings.Add(positioning);
+                AssignManagingProperties(item);
             }
         }
     }
@@ -226,6 +234,20 @@ public class GM : MonoBehaviour {
                 UpdateFindObjectPositon(ref generatedObject, GetRangeFromPlayer(player.transform.position));
             }
         }
+
+        Debug.Log("Restart");
+    }
+
+    private void StickerGenerate_OnTrigger() {
+        var generatedObject = stickers[0];
+
+        GameObject gO = GameObject.Instantiate(generatedObject, player.transform);
+
+        gO.transform.Translate(new Vector3(0, 0, 2));
+
+        gO.transform.SetParent(UIParent);
+
+        AssignManagingProperties(gO);
 
         Debug.Log("Restart");
     }

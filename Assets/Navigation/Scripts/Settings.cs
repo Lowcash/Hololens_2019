@@ -46,6 +46,9 @@ public class Settings : MonoBehaviour {
     private void OnRestartButtonClick() {
         GM.OnRestart();
     }
+    public void OnStickerButtonClick() {
+        GM.OnStickerGenerate();
+    }
 
     #region Fade
     private void OnHideSettingsButtonClick() {
