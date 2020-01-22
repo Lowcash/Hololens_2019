@@ -308,7 +308,7 @@ namespace HoloToolkit.UI.Keyboard
         private void OnDisable()
         {
             m_LastKeyboardLayout = LayoutType.Alpha;
-            Clear();
+            //Clear();
         }
 
 
@@ -545,8 +545,8 @@ namespace HoloToolkit.UI.Keyboard
 
         private bool IsMicrophoneActive()
         {
-            var result = _recordImage.color != _defaultColor;
-            return result;
+           // var result = _recordImage.color != _defaultColor;
+            return false;
         }
 
         /// <summary>
@@ -874,8 +874,7 @@ namespace HoloToolkit.UI.Keyboard
         /// </summary>
         public void Close()
         {
-            if (IsMicrophoneActive())
-            {
+            if (IsMicrophoneActive()) {
                 StartCoroutine(DictationInputManager.StopRecording());
             }
             SetMicrophoneDefault();

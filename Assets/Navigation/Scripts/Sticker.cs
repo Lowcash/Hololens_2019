@@ -9,5 +9,6 @@ public class Sticker : MonoBehaviour {
     public GameObject keyboardObject;
 
     public void OnEditButtonClick() {
+        keyboardObject.SetActive(true);
     }
 }
