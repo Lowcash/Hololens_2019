@@ -7573,7 +7573,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 114830700887680706}
-        m_MethodName: OnStickerButtonClick
+        m_MethodName: OnPulseButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
