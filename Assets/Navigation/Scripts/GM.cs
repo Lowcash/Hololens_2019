@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.SpatialMapping;
+using HoloToolkit.UI.Keyboard;
 
 public class ChangeFindObjectTransformEventArgs : EventArgs {
     public GameObject createdObject;
@@ -30,6 +31,7 @@ public class GM : MonoBehaviour {
     public List<GameObject> menus = new List<GameObject>();
     public List<GameObject> stickers = new List<GameObject>();
     public List<GameObject> navigations = new List<GameObject>();
+    public GameObject keyboard;
 
     [Header("Generate object parents")]
     public Transform objectToFindParent;
@@ -45,6 +47,7 @@ public class GM : MonoBehaviour {
     private List<GameObject> _generatedNavigations = new List<GameObject>();
     private List<GameObject> _generatedStickers = new List<GameObject>();
     private List<GameObject> _generatedMenus = new List<GameObject>();
+    private List<GameObject> _generatedKeyboards = new List<GameObject>();
 
     private List<Tracking> _trackings = new List<Tracking>();
     private List<Measurement> _measurements = new List<Measurement>();
@@ -57,6 +60,7 @@ public class GM : MonoBehaviour {
     private void Awake() {
         OnRestart += Restart_OnTrigger;
         OnStickerGenerate += StickerGenerate_OnTrigger;
+        Sticker.OnStickerObjectTransform += KeyboardGenerate_OnChangeTransform;
 
         HologramBehaviour.OnClicked += Hologram_OnClick;
 
@@ -250,6 +254,20 @@ public class GM : MonoBehaviour {
         AssignManagingProperties(gO);
 
         Debug.Log("Restart");
+    }
+
+    private void KeyboardGenerate_OnChangeTransform( object sender, StickerObjectTransformEventArgs e ) {
+        keyboard.transform.SetParent(e.stickerTransform);
+
+        keyboard.transform.position = e.stickerTransform.position;
+        keyboard.transform.rotation = e.stickerTransform.rotation;
+
+        keyboard.transform.Translate(new Vector3(0, -0.10f, -0.25f));
+        keyboard.transform.LookAt(player.transform);
+
+        keyboard.GetComponent<Keyboard>().InputField = e.outputTextObject.GetComponent<SliderInputField>();
+
+        keyboard.SetActive(true);
     }
     #endregion Handlers
 }
