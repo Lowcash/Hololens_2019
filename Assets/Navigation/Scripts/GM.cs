@@ -33,6 +33,9 @@ public class GM : MonoBehaviour {
     public List<GameObject> navigations = new List<GameObject>();
     public GameObject keyboard;
 
+    [Header("Spatial Mapping")]
+    public SpatialObserver spatialObserverScript;
+
     [Header("Generate object parents")]
     public Transform objectToFindParent;
     public Transform navigationObjectParent;
@@ -47,7 +50,6 @@ public class GM : MonoBehaviour {
     private List<GameObject> _generatedNavigations = new List<GameObject>();
     private List<GameObject> _generatedStickers = new List<GameObject>();
     private List<GameObject> _generatedMenus = new List<GameObject>();
-    private List<GameObject> _generatedKeyboards = new List<GameObject>();
 
     private List<Tracking> _trackings = new List<Tracking>();
     private List<Measurement> _measurements = new List<Measurement>();
@@ -61,6 +63,7 @@ public class GM : MonoBehaviour {
         OnRestart += Restart_OnTrigger;
         OnStickerGenerate += StickerGenerate_OnTrigger;
         Sticker.OnStickerObjectTransform += KeyboardGenerate_OnChangeTransform;
+        Sticker.OnStickerObjectDelete += StickerDelete_OnClick;
 
         HologramBehaviour.OnClicked += Hologram_OnClick;
 
@@ -217,6 +220,8 @@ public class GM : MonoBehaviour {
     private void Hologram_OnClick( object sender, HologramClickEventArgs e ) {
         ObjectHelper.SetCollidersActive(ref _generatedPlanesCollider, e.isClicked);
 
+        spatialObserverScript.SetColliders(e.isClicked);
+
 #if UNITY_EDITOR
         Debug.LogFormat("Hologram {0}", e.isClicked ? "clicked" : "unclicked");
 #endif
@@ -247,6 +252,8 @@ public class GM : MonoBehaviour {
 
         GameObject gO = GameObject.Instantiate(generatedObject, player.transform);
 
+        _generatedStickers.Add(gO);
+
         gO.transform.Translate(new Vector3(0, 0, 2));
 
         gO.transform.SetParent(UIParent);
@@ -269,5 +276,14 @@ public class GM : MonoBehaviour {
 
         keyboard.SetActive(true);
     }
+    private void StickerDelete_OnClick( object sender, StickerObjectTransformEventArgs e ) {
+        _generatedStickers.Remove(e.stickerObject);
+
+        keyboard.SetActive(false);
+        keyboard.transform.SetParent(player.transform);
+
+        GameObject.Destroy(e.stickerObject);
+    }
+
     #endregion Handlers
 }

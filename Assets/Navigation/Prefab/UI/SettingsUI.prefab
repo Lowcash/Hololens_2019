@@ -1596,7 +1596,7 @@ GameObject:
   - component: {fileID: 224634266992340684}
   - component: {fileID: 222456512050254178}
   - component: {fileID: 114412925220420360}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1811,7 +1811,7 @@ GameObject:
   - component: {fileID: 224654201763054206}
   - component: {fileID: 222367403510782802}
   - component: {fileID: 114768317076120658}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Description (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2033,7 +2033,7 @@ GameObject:
   - component: {fileID: 224684650597063014}
   - component: {fileID: 222663508037673860}
   - component: {fileID: 114943934759948676}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2086,7 +2086,7 @@ GameObject:
   - component: {fileID: 224924768305373146}
   - component: {fileID: 222070157669456010}
   - component: {fileID: 114487853793955142}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Subtitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2103,7 +2103,7 @@ GameObject:
   - component: {fileID: 224220495933227764}
   - component: {fileID: 222448311654206398}
   - component: {fileID: 114284914308081292}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Subtitle (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9489,7 +9489,7 @@ MonoBehaviour:
   DisableIcon: 0
   OverrideIcon: 1
   iconName: ObjectCollectionScatter
-  iconOverride: {fileID: 2800000, guid: f6f44dc3b387f9d48bcaaee0038969c4, type: 3}
+  iconOverride: {fileID: 2800000, guid: fdac2bce952169d46986bf702e00f2e6, type: 3}
   alpha: 1
 --- !u!114 &114379990400410994
 MonoBehaviour:
