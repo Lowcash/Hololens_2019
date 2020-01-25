@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f654ab12fc5b16742a0374968c8e9145, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToScale: {fileID: 1025100630768024, guid: 7099e582cf0df0d4fb8e95f9f2ce569e,
+  objectToScale: {fileID: 1915201088813248, guid: 75c115d33988eac4c8f328242984366d,
     type: 2}
   fromObject: {fileID: 0}
   toObject: {fileID: 4735267353525986}
