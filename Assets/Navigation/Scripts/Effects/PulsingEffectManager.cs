@@ -33,7 +33,7 @@ public class PulsingEffectManager : MonoBehaviour {
 
     private int _previousCountOfWaves = 5;
 
-    private List<float> _actualScales = new List<float>();
+    private List<float> _actualWaveState = new List<float>();
 
     private List<Transform> _scaleObjects = new List<Transform>();
 
@@ -72,44 +72,43 @@ public class PulsingEffectManager : MonoBehaviour {
 
             _scaleObjects[i].LookAt(fromObject);
 
-            float zDistance = distance * ((float)(i + 1) / (float)(_scaleObjects.Count));
+            float zDistance = distance * _actualWaveState[i];
             float scaleSize = zDistance / distance;
 
             _scaleObjects[i].Translate(new Vector3(0, 0, zDistance));
             _scaleObjects[i].localScale = _defaultScale * scaleSize;
         }
 
-        //UpdateScale(scaleDirection);
+        UpdateScale(scaleDirection);
+        SetWaveTransparency(scaleDirection);
     }
 
     private void UpdateScale( ScaleDirection direction ) {
-        for (int i = 0; i < countOfWaves; i++) {
-            _actualScales[i] += (Time.deltaTime * speedOfTransition) * (direction == ScaleDirection.Forward ? -1 : 1);
+        for (int i = 0; i < _actualWaveState.Count; i++) {
+            _actualWaveState[i] += (Time.deltaTime * speedOfTransition) * (direction == ScaleDirection.Forward ? -1 : 1);
 
             // reset wave position
             switch (direction) {
                 case ScaleDirection.Forward:
-                _actualScales[i] = _actualScales[i] < fromScale ? toScale : _actualScales[i];
+                _actualWaveState[i] = _actualWaveState[i] < fromScale ? toScale : _actualWaveState[i];
 
                 break;
 
                 case ScaleDirection.Backward:
-                _actualScales[i] = _actualScales[i] > toScale ? fromScale : _actualScales[i];
+                _actualWaveState[i] = _actualWaveState[i] > toScale ? fromScale : _actualWaveState[i];
 
                 break;
             }
-
-            //_scaleObjects[i].transform.localScale = _defaultScale * _actualScales[i] * _cameraDistanceScale;
         }
     }
 
     private void SetWaveTransparency( ScaleDirection direction ) {
         for (int i = 0; i < countOfWaves; i++) {
-            if (_actualScales[i] < fromScale + scaleDifferenceToFullTransparency) {
-                _objectsShaderManagers[i].SetTransparency(GetInterpolatedValueFromRange(fromScale, fromScale + scaleDifferenceToFullTransparency, _actualScales[i]));
+            if (_actualWaveState[i] < fromScale + scaleDifferenceToFullTransparency) {
+                _objectsShaderManagers[i].SetTransparency(GetInterpolatedValueFromRange(fromScale, fromScale + scaleDifferenceToFullTransparency, _actualWaveState[i]));
             }
-            if (_actualScales[i] > toScale - scaleDifferenceToFullTransparency) {
-                _objectsShaderManagers[i].SetTransparency(GetInterpolatedValueFromRange(toScale, toScale - scaleDifferenceToFullTransparency, _actualScales[i]));
+            if (_actualWaveState[i] > toScale - scaleDifferenceToFullTransparency) {
+                _objectsShaderManagers[i].SetTransparency(GetInterpolatedValueFromRange(toScale, toScale - scaleDifferenceToFullTransparency, _actualWaveState[i]));
             }
         }
     }
@@ -130,6 +129,10 @@ public class PulsingEffectManager : MonoBehaviour {
             var generatedObject = Instantiate(objectToScale, transform);
 
             _scaleObjects.Add(generatedObject.transform);
+
+            _actualWaveState.Add((float)(i + 1) / (float)(countOfWaves));
+
+            _objectsShaderManagers.Add(generatedObject.GetComponent<ShaderExtensionEffectManager>());
         }
     }
 
@@ -137,7 +140,7 @@ public class PulsingEffectManager : MonoBehaviour {
         _scaleObjects.ForEach(o => GameObject.Destroy(o.gameObject));
 
         _scaleObjects.Clear();
-        _actualScales.Clear();
+        _actualWaveState.Clear();
         _objectsShaderManagers.Clear();
     }
 
