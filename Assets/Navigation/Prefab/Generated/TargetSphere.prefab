@@ -124,8 +124,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f654ab12fc5b16742a0374968c8e9145, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToScale: {fileID: 1353380736557630, guid: c7caeedb395d6f343b15f22e034b4ee8,
+  objectToScale: {fileID: 1025100630768024, guid: 7099e582cf0df0d4fb8e95f9f2ce569e,
     type: 2}
+  fromObject: {fileID: 0}
+  toObject: {fileID: 4735267353525986}
+  fromObjectOffsetDistance: 2
   fromScale: 0
   toScale: 1
   scaleDifferenceToFullTransparency: 0.5

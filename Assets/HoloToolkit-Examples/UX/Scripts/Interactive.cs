@@ -213,9 +213,9 @@ namespace HoloToolkit.Examples.InteractiveElements
                 {
                     if (mKeywordRecognizer == null)
                     {
-                        mKeywordRecognizer = new KeywordRecognizer(mKeywordArray);
-                        mKeywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;
-                        mKeywordRecognizer.Start();
+                        //mKeywordRecognizer = new KeywordRecognizer(mKeywordArray);
+                        //mKeywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;
+                        //mKeywordRecognizer.Start();
                     }
                     else
                     {

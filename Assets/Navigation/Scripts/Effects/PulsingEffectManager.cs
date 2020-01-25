@@ -9,6 +9,11 @@ public class PulsingEffectManager : MonoBehaviour {
     [Header("Pulse object")]
     public GameObject objectToScale;
 
+    [Header("Pulse between")]
+    public Transform fromObject;
+    public Transform toObject;
+    public float fromObjectOffsetDistance = 2.0f;
+
     [Header("Scale settings")]
     public float fromScale = 0.0f;
     public float toScale = 1.0f;
@@ -20,6 +25,8 @@ public class PulsingEffectManager : MonoBehaviour {
     public float speedOfTransition = 0.1f;
 
     public int countOfWaves = 5;
+
+    private Transform _defaultToObjectTransform;
 
     private SpatialMappingSource spatialMappingSource;
 
@@ -34,7 +41,7 @@ public class PulsingEffectManager : MonoBehaviour {
     private List<float> _actualScales = new List<float>();
 
     private List<GameObject> _scaleStencils = new List<GameObject>();
-    private List<GameObject> _scaleObjects = new List<GameObject>();
+    private List<Transform> _scaleObjects = new List<Transform>();
 
     private List<ShaderExtensionEffectManager> _objectsShaderManagers = new List<ShaderExtensionEffectManager>();
 
@@ -48,10 +55,14 @@ public class PulsingEffectManager : MonoBehaviour {
 
             spatialMappingSource.SurfaceAdded += Surface_OnAdded;
         }
+
+        _defaultToObjectTransform = toObject;
     }
 
     private void Start() {
         GenerateObjects();
+
+        if (fromObject == null) { fromObject = Camera.main.transform; }
     }
 
     private void Update() {
@@ -62,14 +73,21 @@ public class PulsingEffectManager : MonoBehaviour {
             _previousCountOfWaves = countOfWaves;
         }
 
-        RecalculateCameraDistance();
+        float distance = Vector3.Distance(fromObject.transform.position, toObject.transform.position) + fromObjectOffsetDistance;
 
-        UpdateScale(scaleDirection);
-        SetWaveTransparency(scaleDirection);
-    }
+        for (int i = 0; i < _scaleObjects.Count; ++i) {
+            _scaleObjects[i].position = toObject.position;
 
-    private void RecalculateCameraDistance() {
-        _cameraDistanceScale = Vector3.Distance(Camera.main.transform.position, transform.position);
+            _scaleObjects[i].LookAt(fromObject);
+
+            float zDistance = distance * ((float)(i + 1) / (float)(_scaleObjects.Count));
+            float scaleSize = zDistance / distance;
+
+            _scaleObjects[i].Translate(new Vector3(0, 0, zDistance));
+            _scaleObjects[i].localScale = _defaultScale * scaleSize;
+        }
+
+        //UpdateScale(scaleDirection);
     }
 
     private void UpdateScale( ScaleDirection direction ) {
@@ -116,26 +134,17 @@ public class PulsingEffectManager : MonoBehaviour {
 
         _defaultScale = objectToScale.transform.localScale;
 
-        _scaleBetweenWaves = toScale / countOfWaves;
-
         for (int i = 0; i < countOfWaves; i++) {
-            var scale = fromScale + (i * _scaleBetweenWaves);
-
             var generatedObject = Instantiate(objectToScale, transform);
-            generatedObject.transform.localScale *= scale;
 
-            _scaleObjects.Add(generatedObject);
-            _actualScales.Add(scale);
-            _objectsShaderManagers.Add(generatedObject.GetComponent<ShaderExtensionEffectManager>());
+            _scaleObjects.Add(generatedObject.transform);
         }
     }
 
     private void DestroyGeneratedObjects() {
-        _scaleObjects.ForEach(o => GameObject.Destroy(o));
-        _scaleStencils.ForEach(o => GameObject.Destroy(o));
+        _scaleObjects.ForEach(o => GameObject.Destroy(o.gameObject));
 
         _scaleObjects.Clear();
-        _scaleStencils.Clear();
         _actualScales.Clear();
         _objectsShaderManagers.Clear();
     }
