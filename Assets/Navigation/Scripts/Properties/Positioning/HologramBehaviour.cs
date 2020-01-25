@@ -25,7 +25,6 @@ public class HologramBehaviour : PositioningProperty, IInputHandler {
 
     private Ray _ray = new Ray();
     private RaycastHit _hit;
-    private RaycastHit _cameraHit;
 
     private Rigidbody _rb;
     private Collider _tapTriggerCollider;

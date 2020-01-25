@@ -80,7 +80,7 @@ public class GM : MonoBehaviour {
     }
 
     private void Start() {
-        //SetSceneInit(true);
+        SetSceneInit(true);
 
         if (generateNavigations)
             GenerateObjects(navigations, ref _generatedNavigations, navigationObjectParent);
@@ -108,6 +108,12 @@ public class GM : MonoBehaviour {
         _trackings.ForEach(g => g.StartTracking());
         _visualizings.ForEach(v => v.StartVisualizing());
         _positionings.ForEach(p => p.StartPositioning());
+
+        Invoke("HideInitScreenAfter", 2.0f);
+    }
+
+    private void HideInitScreenAfter() {
+        SetSceneInit(false);
     }
 
     private void UpdateFindObjectPositon( ref GameObject objectToFind, Vector3 newPosition ) {
@@ -202,6 +208,7 @@ public class GM : MonoBehaviour {
 
         initScreen.SetActive(isInitializing);
 
+        ObjectHelper.SetGameObjectsActive(ref _generatedMenus, !isInitializing);
         ObjectHelper.SetGameObjectsActive(ref _generatedStickers, !isInitializing);
         ObjectHelper.SetGameObjectsActive(ref _generatedNavigations, !isInitializing);
         ObjectHelper.SetGameObjectsActive(ref _generatedFindObjects, !isInitializing);

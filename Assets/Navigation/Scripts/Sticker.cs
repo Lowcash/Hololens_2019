@@ -29,12 +29,12 @@ public class Sticker : MonoBehaviour {
 
     public List<Renderer> renderers = new List<Renderer>();
 
-    private StickerLayerState _actualSettingLayerState = StickerLayerState.MAIN;
-
     private void Start() {
         redSliderControl.SetSliderValue(255.0f);
         greenSliderControl.SetSliderValue(255.0f);
         blueSliderControl.SetSliderValue(255.0f);
+
+        colorPanelFade.gameObject.SetActive(false);
     }
 
     public void OnDeleteButtonClick() {

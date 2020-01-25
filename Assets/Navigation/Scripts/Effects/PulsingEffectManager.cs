@@ -26,21 +26,15 @@ public class PulsingEffectManager : MonoBehaviour {
 
     public int countOfWaves = 5;
 
-    private Transform _defaultToObjectTransform;
-
     private SpatialMappingSource spatialMappingSource;
 
     private Vector3 _defaultScale;
     private Vector3 _pulseToPosition;
 
-    private float _cameraDistanceScale;
-    private float _scaleBetweenWaves;
-
     private int _previousCountOfWaves = 5;
 
     private List<float> _actualScales = new List<float>();
 
-    private List<GameObject> _scaleStencils = new List<GameObject>();
     private List<Transform> _scaleObjects = new List<Transform>();
 
     private List<ShaderExtensionEffectManager> _objectsShaderManagers = new List<ShaderExtensionEffectManager>();
@@ -55,8 +49,6 @@ public class PulsingEffectManager : MonoBehaviour {
 
             spatialMappingSource.SurfaceAdded += Surface_OnAdded;
         }
-
-        _defaultToObjectTransform = toObject;
     }
 
     private void Start() {
@@ -107,7 +99,7 @@ public class PulsingEffectManager : MonoBehaviour {
                 break;
             }
 
-            _scaleObjects[i].transform.localScale = _defaultScale * _actualScales[i] * _cameraDistanceScale;
+            //_scaleObjects[i].transform.localScale = _defaultScale * _actualScales[i] * _cameraDistanceScale;
         }
     }
 

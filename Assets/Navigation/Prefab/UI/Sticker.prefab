@@ -222,7 +222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1136021119072620
 GameObject:
   m_ObjectHideFlags: 1
@@ -716,12 +716,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4328944040634810}
   - component: {fileID: 65809314669678610}
+  - component: {fileID: 114107728025389858}
   - component: {fileID: 114599022606540206}
   - component: {fileID: 114125995036223094}
   - component: {fileID: 114730988134261268}
   - component: {fileID: 114040689353926646}
-  - component: {fileID: 114107728025389858}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Sticker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -933,7 +933,7 @@ GameObject:
   - component: {fileID: 224814496021554562}
   - component: {fileID: 222289848040600828}
   - component: {fileID: 114782244034243570}
-  m_Layer: 2
+  m_Layer: 5
   m_Name: Subtitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2991,7 +2991,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 4f37668d794e3694c9ee36b62447d99b, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6159,15 +6159,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tag: defaultColor
-  Default: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-  Focus: {r: 0.9019608, g: 0.9019608, b: 0.9019608, a: 1}
-  Press: {r: 0.7019608, g: 0.7019608, b: 0.7019608, a: 1}
-  Selected: {r: 0.06666667, g: 0.6117647, b: 0.8745098, a: 1}
-  FocusSelected: {r: 0.29411766, g: 0.7607843, b: 0.9843137, a: 1}
-  PressSelected: {r: 0.14509805, g: 0.5058824, b: 0.68235296, a: 1}
+  Default: {r: 0.68235296, g: 0.14509805, b: 0.14509805, a: 1}
+  Focus: {r: 0.68235296, g: 0.14509805, b: 0.14509805, a: 1}
+  Press: {r: 0.68235296, g: 0.14509805, b: 0.14509805, a: 1}
+  Selected: {r: 0.68235296, g: 0.14509805, b: 0.14509805, a: 1}
+  FocusSelected: {r: 0.68235296, g: 0.14509805, b: 0.14509805, a: 1}
+  PressSelected: {r: 0.68235296, g: 0.14509805, b: 0.14509805, a: 1}
   Disabled: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
   DisabledSelected: {r: 0.3529412, g: 0.3529412, b: 0.3529412, a: 1}
-  CurrentValue: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+  CurrentValue: {r: 0.68235296, g: 0.14509805, b: 0.14509805, a: 1}
   Button: {fileID: 0}
 --- !u!114 &114757166180329378
 MonoBehaviour:
