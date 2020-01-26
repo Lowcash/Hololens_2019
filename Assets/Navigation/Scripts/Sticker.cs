@@ -28,7 +28,12 @@ public class Sticker : MonoBehaviour {
     public SliderGestureControl greenSliderControl;
     public SliderGestureControl blueSliderControl;
 
+    [Header("Resize")]
+    public GameObject boundingBoxRigObject;
+
     public List<Renderer> renderers = new List<Renderer>();
+
+    private bool _isResizeMode = false;
 
     private void Start() {
         redSliderControl.SetSliderValue(255.0f);
@@ -47,11 +52,27 @@ public class Sticker : MonoBehaviour {
     }
 
     public void OnChangeModeButtonClick() {
-        BoundingBoxRig obj;
+        colorPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeIn);
 
-        //colorPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeIn);
+        mainPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
+    }
 
-        //mainPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
+    public void OnResizeButtonClick() {
+        if (!_isResizeMode) {
+            boundingBoxRigObject.transform.SetParent(transform.parent);
+            gameObject.transform.SetParent(boundingBoxRigObject.transform);
+
+            boundingBoxRigObject.GetComponent<BoundingBoxRig>().boxInstance.Target.GetComponent<BoundingBoxRig>().Activate();
+
+            _isResizeMode = true;
+        } else {
+            gameObject.transform.SetParent(boundingBoxRigObject.transform.parent);
+            boundingBoxRigObject.transform.SetParent(gameObject.transform);
+
+            boundingBoxRigObject.GetComponent<BoundingBoxRig>().boxInstance.Target.GetComponent<BoundingBoxRig>().Deactivate();
+
+            _isResizeMode = false;
+        }
     }
 
     public void OnBackButtonClick() {
