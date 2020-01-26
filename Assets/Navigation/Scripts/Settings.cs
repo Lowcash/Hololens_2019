@@ -2,6 +2,7 @@
 using UnityEngine;
 using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Examples.InteractiveElements;
+using HoloToolkit.Unity.UX;
 
 public class Settings : MonoBehaviour {
     public enum SettingLayerState { MAIN, DISTORTION, PULSE }
@@ -26,6 +27,13 @@ public class Settings : MonoBehaviour {
     public InteractiveToggle speed2;
     public InteractiveToggle speed3;
     public InteractiveToggle speed4;
+
+    [Header("Resize")]
+    public GameObject boundingBoxRigObject;
+
+    private bool _isResizeMode = false;
+
+    private GameObject _appBar;
 
     private DistortionManager _distortionManager;
     private PulsingEffectManager _pulsingEffectManager;
@@ -87,6 +95,28 @@ public class Settings : MonoBehaviour {
             case SettingLayerState.PULSE:
             pulsePanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
             break;
+        }
+    }
+
+    public void OnResizeButtonClick() {
+        if (!_isResizeMode) {
+            boundingBoxRigObject.transform.SetParent(transform.parent);
+            gameObject.transform.SetParent(boundingBoxRigObject.transform);
+
+            boundingBoxRigObject.SetActive(true);
+
+            boundingBoxRigObject.GetComponent<BoundingBoxRig>().boxInstance.Target.GetComponent<BoundingBoxRig>().Activate();
+
+            _isResizeMode = true;
+        } else {
+            boundingBoxRigObject.SetActive(false);
+
+            gameObject.transform.SetParent(boundingBoxRigObject.transform.parent);
+            boundingBoxRigObject.transform.SetParent(gameObject.transform);
+
+            boundingBoxRigObject.GetComponent<BoundingBoxRig>().boxInstance.Target.GetComponent<BoundingBoxRig>().Deactivate();
+
+            _isResizeMode = false;
         }
     }
     #endregion

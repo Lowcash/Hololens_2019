@@ -28,7 +28,7 @@ GameObject:
   - component: {fileID: 114695123884858600}
   - component: {fileID: 114680319634683170}
   - component: {fileID: 114346661000134944}
-  m_Layer: 8
+  m_Layer: 5
   m_Name: Meter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +62,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4895571893182882}
-  m_Layer: 8
+  m_Layer: 5
   m_Name: RenderWrapper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 33155087542864736}
   - component: {fileID: 65946240622478340}
   - component: {fileID: 23406949175789122}
-  m_Layer: 8
+  m_Layer: 5
   m_Name: MeterRender
   m_TagString: Untagged
   m_Icon: {fileID: 0}

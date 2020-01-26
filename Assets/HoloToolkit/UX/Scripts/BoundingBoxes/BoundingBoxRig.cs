@@ -189,7 +189,7 @@ namespace HoloToolkit.Unity.UX
             }
         }
 
-        private BoundingBox boxInstance;
+        public BoundingBox boxInstance;
 
         private GameObject objectToBound;
 

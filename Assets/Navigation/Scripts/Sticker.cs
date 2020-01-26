@@ -1,4 +1,5 @@
 ﻿using HoloToolkit.Examples.InteractiveElements;
+using HoloToolkit.Unity.UX;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,9 +47,11 @@ public class Sticker : MonoBehaviour {
     }
 
     public void OnChangeModeButtonClick() {
-        colorPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeIn);
+        BoundingBoxRig obj;
 
-        mainPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
+        //colorPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeIn);
+
+        //mainPanelFade.StartFade(FadeEffectManager.FadeDirection.FadeOut);
     }
 
     public void OnBackButtonClick() {

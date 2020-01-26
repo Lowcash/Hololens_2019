@@ -117,7 +117,7 @@ namespace HoloToolkit.Unity.InputModule
                 ControllerSourceState.MenuPressed = MenuButtonControl.Pressed();
 
                 if (!menuPressed && ControllerSourceState.MenuPressed) {
-                    OnMenuButtonClicked(inputHand);
+                    //OnMenuButtonClicked(inputHand);
 
                     menuPressed = true;
                 }

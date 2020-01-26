@@ -80,7 +80,7 @@ public class PulsingEffectManager : MonoBehaviour {
         }
 
         UpdateScale(scaleDirection);
-        //SetWaveTransparency(scaleDirection);
+        SetWaveTransparency(scaleDirection);
     }
 
     private void UpdateScale( ScaleDirection direction ) {

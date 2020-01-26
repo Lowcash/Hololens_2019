@@ -128,13 +128,13 @@ MonoBehaviour:
     type: 2}
   fromObject: {fileID: 0}
   toObject: {fileID: 4735267353525986}
-  fromObjectOffsetDistance: 2
+  fromObjectOffsetDistance: 15
   fromScale: 0
   toScale: 1
   scaleDifferenceToFullTransparency: 0.5
   scaleDirection: 0
-  speedOfTransition: 0.2
-  countOfWaves: 2
+  speedOfTransition: 0.05
+  countOfWaves: 25
 --- !u!135 &135078486862923466
 SphereCollider:
   m_ObjectHideFlags: 1

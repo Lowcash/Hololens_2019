@@ -80,7 +80,7 @@ public class GM : MonoBehaviour {
     }
 
     private void Start() {
-        SetSceneInit(true);
+        //SetSceneInit(true);
 
         if (generateNavigations)
             GenerateObjects(navigations, ref _generatedNavigations, navigationObjectParent);
@@ -109,7 +109,7 @@ public class GM : MonoBehaviour {
         _visualizings.ForEach(v => v.StartVisualizing());
         _positionings.ForEach(p => p.StartPositioning());
 
-        Invoke("HideInitScreenAfter", 2.0f);
+        //Invoke("HideInitScreenAfter", 2.0f);
     }
 
     private void HideInitScreenAfter() {

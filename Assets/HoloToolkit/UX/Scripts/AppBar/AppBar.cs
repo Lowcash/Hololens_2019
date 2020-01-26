@@ -334,10 +334,10 @@ namespace HoloToolkit.Unity.UX
             transform.position = smooth ? Vector3.Lerp(transform.position, finalPosition, 0.5f) : finalPosition;
 
             // Rotate on the y axis
-            Vector3 eulerAngles = Quaternion.LookRotation((boundingBox.transform.position - finalPosition).normalized, Vector3.up).eulerAngles;
+            /*Vector3 eulerAngles = Quaternion.LookRotation((boundingBox.transform.position - finalPosition).normalized, Vector3.up).eulerAngles;
             eulerAngles.x = 0f;
             eulerAngles.z = 0f;
-            transform.eulerAngles = eulerAngles;
+            transform.eulerAngles = eulerAngles;*/
         }
 
         private void Update()
