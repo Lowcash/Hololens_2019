@@ -103,14 +103,10 @@ public class Settings : MonoBehaviour {
             boundingBoxRigObject.transform.SetParent(transform.parent);
             gameObject.transform.SetParent(boundingBoxRigObject.transform);
 
-            boundingBoxRigObject.SetActive(true);
-
             boundingBoxRigObject.GetComponent<BoundingBoxRig>().boxInstance.Target.GetComponent<BoundingBoxRig>().Activate();
 
             _isResizeMode = true;
         } else {
-            boundingBoxRigObject.SetActive(false);
-
             gameObject.transform.SetParent(boundingBoxRigObject.transform.parent);
             boundingBoxRigObject.transform.SetParent(gameObject.transform);
 
