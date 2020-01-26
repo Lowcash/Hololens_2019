@@ -13,6 +13,7 @@ public class GM : MonoBehaviour {
     public static EventHandler<ChangeFindObjectTransformEventArgs> OnChangeFindObjectTransform;
     public static Action OnRestart;
     public static Action OnStickerGenerate;
+    public static Action OnNavigationMode;
 
     public GameObject player;
     public GameObject initScreen;
@@ -45,6 +46,7 @@ public class GM : MonoBehaviour {
     private SurfaceMeshesToPlanes surfaceMeshToPlane;
 
     private bool _isSceneInitializing;
+    private bool _isNavigationFreezed = false;
 
     private List<GameObject> _generatedFindObjects = new List<GameObject>();
     private List<GameObject> _generatedNavigations = new List<GameObject>();
@@ -62,6 +64,7 @@ public class GM : MonoBehaviour {
     private void Awake() {
         OnRestart += Restart_OnTrigger;
         OnStickerGenerate += StickerGenerate_OnTrigger;
+        OnNavigationMode += NavigationMode_OnChange;
         Sticker.OnStickerObjectTransform += KeyboardGenerate_OnChangeTransform;
         Sticker.OnStickerObjectDelete += StickerDelete_OnClick;
 
@@ -267,7 +270,23 @@ public class GM : MonoBehaviour {
 
         AssignManagingProperties(gO);
 
+        _positionings.ForEach(p => p.StartPositioning());
+
         Debug.Log("Restart");
+    }
+
+    private void NavigationMode_OnChange() {
+        if(_isNavigationFreezed) {
+            _generatedNavigations.ForEach(n => n.transform.SetParent(navigationObjectParent));
+            _generatedNavigations.ForEach(n => n.GetComponent<Collider>().enabled = false);
+
+            _isNavigationFreezed = false;
+        } else {
+            _generatedNavigations.ForEach(n => n.transform.SetParent(n.transform.parent.transform.parent));
+            _generatedNavigations.ForEach(n => n.GetComponent<Collider>().enabled = true);
+
+            _isNavigationFreezed = true;
+        }
     }
 
     private void KeyboardGenerate_OnChangeTransform( object sender, StickerObjectTransformEventArgs e ) {

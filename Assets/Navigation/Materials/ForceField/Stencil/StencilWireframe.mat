@@ -80,5 +80,5 @@ Material:
     - _BaseColor: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Position: {r: 0, g: 0, b: 3, a: 0}
+    - _Position: {r: -0.4651922, g: 0.14360105, b: -3.9889164, a: 0}
     - _WireColor: {r: 0.334, g: 0.334, b: 0.334, a: 1}

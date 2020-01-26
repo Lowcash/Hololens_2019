@@ -115,6 +115,11 @@ public class Settings : MonoBehaviour {
             _isResizeMode = false;
         }
     }
+
+    public void OnNavigationSettingsButtonClick() {
+        GM.OnNavigationMode();
+    }
+
     #endregion
 
     #region Distortion
